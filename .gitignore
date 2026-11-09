@@ -1,0 +1,12 @@
+data/raw/
+data/aggregation_curated.csv
+data/raw/si_tables_dump.csv
+reports/figures/*.png
+reports/results.md
+reports/_run.log
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+build/
+*.egg-info/
