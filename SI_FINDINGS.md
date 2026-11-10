@@ -28,8 +28,19 @@ Support-weighted variance explained in the aggregation score:
 | shaking | 0.84 | 0.03 |
 | **pooled** | **0.86** | **0.04** |
 
+![variance explained](reports/figures/si_fig1_variance.png)
+
 Within-mutant spread across conditions is **0.20–0.38×** the between-mutant
-spread. The authors' own example: A30P scores −0.75 in PBS vs −0.31 in Tris,
+spread. Plotting every extracted cell makes the same point directly — each
+mutant's score holds across very different buffers, salts, shaking speeds and
+concentrations, while the mutants themselves sit far apart:
+
+![scores by mutant](reports/figures/si_fig2_scores_by_mutant.png)
+
+The exceptions are visible and worth keeping: A30P in low salt reads +0.67
+against its −0.57 mean, and G51D at medium shaking reads +0.50 against −0.49.
+Conditions can flip an individual reading even where they explain little
+variance overall. The authors' own example: A30P scores −0.75 in PBS vs −0.31 in Tris,
 but averaged PBS→Tris is −0.12 ± 0.31 — no generalizable buffer effect.
 
 **Conclusion (for this dataset): sequence dominates conditions** — the opposite

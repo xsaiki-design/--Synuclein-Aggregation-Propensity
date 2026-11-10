@@ -24,3 +24,9 @@ def test_sequence_explains_more_than_conditions():
     ve = si_analysis.run()["variance_explained"].set_index("dimension")
     row = ve.loc["ALL (pooled)"]
     assert row["r2_sequence_mutant"] > row["r2_conditions_category"]
+
+
+def test_si_report_writes_figures():
+    from asyn import si_report
+    paths = si_report.run()
+    assert len(paths) == 2 and all(p.exists() and p.stat().st_size > 1000 for p in paths)
