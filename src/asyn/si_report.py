@@ -80,7 +80,34 @@ def _save(fig, name) -> Path:
 def run() -> list[Path]:
     res = si_analysis.run()
     df = si_analysis.load()
-    return [fig_variance(res["variance_explained"]), fig_scores_by_mutant(df)]
+    figs = [fig_variance(res["variance_explained"]), fig_scores_by_mutant(df)]
+    types = si_analysis.TYPES_CSV
+    if types.exists():
+        figs.append(fig_type_by_domain(si_analysis.type_by_domain(si_analysis.load_types())))
+    return figs
+
+
+
+
+def fig_type_by_domain(mat) -> Path:
+    """16 substitution transitions x 3 regions. Red accelerates, blue slows —
+    the colour convention the SI's own heat maps use."""
+    fig, ax = plt.subplots(figsize=(6.4, 7.2))
+    im = ax.imshow(mat.values, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto")
+    ax.set_xticks(range(mat.shape[1]))
+    ax.set_xticklabels(mat.columns, rotation=20, ha="right")
+    ax.set_yticks(range(mat.shape[0]))
+    ax.set_yticklabels(mat.index)
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[1]):
+            v = mat.values[i, j]
+            ax.text(j, i, "—" if np.isnan(v) else f"{v:.2f}", ha="center",
+                    va="center", fontsize=8,
+                    color="white" if (not np.isnan(v) and abs(v) > 0.55) else "#222")
+    ax.set_title("Which substitutions change aggregation, and where\n"
+                 "(blue = slows, red = accelerates; — = no data)", fontsize=11)
+    fig.colorbar(im, ax=ax, shrink=0.6, label="aggregation score")
+    return _save(fig, "si_fig3_type_by_domain.png")
 
 
 if __name__ == "__main__":

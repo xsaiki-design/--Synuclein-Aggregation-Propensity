@@ -116,3 +116,36 @@ if __name__ == "__main__":
     print(out["spread"].to_string(index=False))
     print(f"\nA30P buffer scores: {out['a30p_buffer']}")
     print(f"Total measurements behind these cells: {out['n_measurements']}")
+
+
+# --- sequence signal, from Tables S3–S6 -------------------------------------
+TYPES_CSV = Path("data/type_scores.csv")
+# The 16 substitution transitions (the "Cntrl" rows are same-class controls).
+TRANSITIONS = [t for t in (
+    "+ -> -", "- -> +", "nP -> P", "P -> nP", "Sm -> Lg", "Lg -> Sm",
+    "nB -> B", "B -> nB", "nβ -> β", "β -> nβ",
+    "Pro -> X", "X -> Pro", "Gly -> X", "X -> Gly", "PG -> X", "X -> PG")]
+DOMAINS = ["N-terminus", "NAC", "C-terminus"]
+
+
+def load_types(path: Path = TYPES_CSV) -> pd.DataFrame:
+    return pd.read_csv(path)
+
+
+def domain_means(df: pd.DataFrame) -> pd.DataFrame:
+    """Support-weighted mean aggregation score per sequence region."""
+    rows = []
+    for scope, g in df.groupby("scope"):
+        g = g[g["average"].notna() & (g["support"] > 0)]
+        rows.append({"scope": scope,
+                     "weighted_mean_score": round(
+                         float(np.average(g["average"], weights=g["support"])), 3),
+                     "measurements": int(g["support"].sum())})
+    return pd.DataFrame(rows).sort_values("weighted_mean_score")
+
+
+def type_by_domain(df: pd.DataFrame) -> pd.DataFrame:
+    """16 substitution transitions x 3 regions, as a score matrix."""
+    d = df[df["type"].isin(TRANSITIONS) & df["scope"].isin(DOMAINS)]
+    return d.pivot(index="type", columns="scope", values="average").reindex(
+        TRANSITIONS)[DOMAINS]

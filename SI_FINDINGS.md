@@ -47,6 +47,29 @@ but averaged PBS→Tris is −0.12 ± 0.31 — no generalizable buffer effect.
 of the plan's hypothesis that conditions would swamp sequence. A legitimate,
 reportable negative result.
 
+## The sequence side (Tables S3–S6)
+
+`asyn.ingest_types` extracts all four mutation-type tables (104 rows, 866
+measurements) — same CID decoding, but **S5 and S6 use a different glyph
+offset**, so the offset is calibrated per page and every value is bounds-checked
+and spot-checked against the rendered pages (9 checks, in the ingester).
+
+Support-weighted mean score by region — mutations in the fibril core slow
+aggregation most, mutations in the N-terminus barely matter:
+
+| region | weighted mean score | measurements |
+|---|---|---|
+| **NAC (61–95)** | **−0.57** | 145 |
+| C-terminus | −0.35 | 110 |
+| N-terminus | −0.10 | 178 |
+
+The strongest single substitution effects (whole protein, n ≥ 10) are
+**X → Pro (−0.88, n=33)** and **X → PG (−0.85, n=34)** — introducing a proline
+blocks aggregation, and most strongly inside the NAC (−0.94). That is the
+β-sheet-breaking behaviour the fibril model predicts, recovered from the data.
+
+![type by domain](reports/figures/si_fig3_type_by_domain.png)
+
 ### The essential caveat
 The scores are **already WT-normalized within each study**, which removes much
 of the raw between-lab condition variance *by construction*. So this result

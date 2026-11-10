@@ -29,4 +29,19 @@ def test_sequence_explains_more_than_conditions():
 def test_si_report_writes_figures():
     from asyn import si_report
     paths = si_report.run()
-    assert len(paths) == 2 and all(p.exists() and p.stat().st_size > 1000 for p in paths)
+    assert len(paths) >= 2 and all(p.exists() and p.stat().st_size > 1000 for p in paths)
+
+
+def test_type_scores_match_rendered_pages():
+    """The ingester's own spot checks must hold (9 values read off the SI)."""
+    from asyn import ingest_types
+    import pandas as pd
+    df = pd.read_csv(ingest_types.OUT_CSV)
+    assert len(df) == 104 and df["scope"].nunique() == 4
+    ingest_types._verify(df)  # raises on CID drift
+
+
+def test_nac_is_the_most_aggregation_critical_region():
+    d = si_analysis.load_types()
+    m = si_analysis.domain_means(d).set_index("scope")["weighted_mean_score"]
+    assert m["NAC"] < m["C-terminus"] < m["N-terminus"]
