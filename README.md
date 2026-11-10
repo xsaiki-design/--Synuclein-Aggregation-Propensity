@@ -10,9 +10,14 @@ disagrees with itself — A30P has been reported to slow, accelerate, and not
 affect aggregation — and that disagreement is the finding. The main result is a
 **variance decomposition**, with a properly-validated predictor as support.
 
-> **Status:** pipeline complete and green on a **synthetic stand-in**. Drop in
-> the real curated data (one step below) and every number becomes real. No
-> figures or numbers in this repo are scientific results until then.
+> **Status:** real data extracted. The SI PDF turned out to hold **categorical
+> aggregation scores**, not continuous T½ — see **[`SI_FINDINGS.md`](SI_FINDINGS.md)**
+> for what it actually contains and the first real result (sequence explains
+> ~86% of score variance, conditions ~4%, pooled; with an important
+> normalization caveat). `asyn.ingest_si` builds the real
+> `data/conditions_familial.csv`; `asyn.si_analysis` runs the decomposition.
+> The continuous-T½ regression modules below are kept ready for raw kinetics,
+> which this SI does not provide; they currently run on a synthetic stand-in.
 
 ## Get the real data (one manual step)
 The curated set comes from the open-access supplementary PDF of Pancoe et al.
