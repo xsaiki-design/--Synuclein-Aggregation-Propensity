@@ -1,83 +1,84 @@
 # α-Synuclein aggregation: sequence vs. conditions
 
 **Question:** how much of the variation in reported α-synuclein aggregation
-rate (T½, time to half-maximal ThT fluorescence) is explained by the protein's
-**sequence**, and how much by the **experimental conditions** each measurement
-was made under?
+behaviour is explained by the protein's **sequence**, and how much by the
+**experimental conditions** each measurement was made under?
 
-This is deliberately *not* framed as "build a predictor." The literature
-disagrees with itself — A30P has been reported to slow, accelerate, and not
-affect aggregation — and that disagreement is the finding. The main result is a
-**variance decomposition**, with a properly-validated predictor as support.
+Data: the open-access supplementary tables of **Pancoe et al. 2022**
+(*J Mol Biol* 434(23):167859, [PMC9922159](https://pmc.ncbi.nlm.nih.gov/articles/PMC9922159)),
+whose authors explicitly tabulated these data for computational reuse.
+Everything below is extracted from that PDF and verified against it — see
+[`SI_FINDINGS.md`](SI_FINDINGS.md) for the full write-up and caveats.
 
-> **Status:** real data extracted. The SI PDF turned out to hold **categorical
-> aggregation scores**, not continuous T½ — see **[`SI_FINDINGS.md`](SI_FINDINGS.md)**
-> for what it actually contains and the first real result (sequence explains
-> ~86% of score variance, conditions ~4%, pooled; with an important
-> normalization caveat). `asyn.ingest_si` builds the real
-> `data/conditions_familial.csv`; `asyn.si_analysis` runs the decomposition.
-> The continuous-T½ regression modules below are kept ready for raw kinetics,
-> which this SI does not provide; they currently run on a synthetic stand-in.
+## Results
 
-## Get the real data (one manual step)
-The curated set comes from the open-access supplementary PDF of Pancoe et al.
-2022. Its download is behind a browser proof-of-work gate, so fetch it by hand:
+**1. Sequence dominates conditions.** Across the 7 familial mutants, *which
+mutant* explains ~86% of the variance in aggregation score; *which condition
+category* (buffer / salt / shaking / concentration) explains ~4%.
 
-1. Open <https://pmc.ncbi.nlm.nih.gov/articles/PMC9922159/>
-2. Download **`Supporting_Information.pdf`** (NIHMS1869546-supplement) and save
-   it as `data/raw/SI.pdf`.
-3. `make inspect` → dumps the extracted tables to
-   `data/raw/si_tables_dump.csv` for you to confirm the layout.
-4. Confirm the column mapping in `src/asyn/ingest.py::_map_rows`, then
-   `make data` to build `data/aggregation_curated.csv`.
+![variance explained](reports/figures/si_fig1_variance.png)
 
-Until then, `make data-synth` writes a labelled synthetic stand-in so the whole
-analysis runs. See `data/data_dictionary.md` for the schema and provenance.
+Each mutant's score holds across very different conditions, while the mutants
+themselves sit far apart — though the real exceptions are visible and kept
+(A30P in low salt flips to +0.67; G51D at medium shaking to +0.50):
 
-## Run it
-```bash
-make setup        # pip install -e .[dev]
-make all          # synthetic data + full analysis (or: make data && make analysis)
-make check        # tests + analysis
-```
-Outputs: `reports/results.md`, and figures under `reports/figures/`.
+![scores by mutant](reports/figures/si_fig2_scores_by_mutant.png)
 
-## What the code does (maps to the phased plan)
-| Module | Phase | Role |
+**2. The NAC core is where sequence matters.** Support-weighted mean score by
+region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. The
+strongest single substitution is **X → Pro (−0.88, n=33)**, strongest inside
+the NAC (−0.94) — the β-sheet-breaking effect the fibril model predicts,
+recovered from the data.
+
+![type by domain](reports/figures/si_fig3_type_by_domain.png)
+
+> **The caveat that matters:** the scores are *already WT-normalized within
+> each study*, which removes much raw between-lab condition variance by
+> construction. So result 1 says conditions add little **once effects are
+> expressed against a matched WT control** — which is exactly the authors'
+> recommendation, not evidence that raw rates are condition-independent.
+
+## The data, and how it was verified
+The outcome in this SI is a **categorical aggregation score** in {−1, 0, +1}
+(reduces / no effect / accelerates), **not** continuous T½. T½ is not tabulated
+in this file.
+
+| file | source | rows |
 |---|---|---|
-| `asyn.ingest` | 1 | Build curated CSV from the real SI PDF (no fabrication). |
-| `asyn.synth` | — | Synthetic stand-in in the same schema. |
-| `asyn.features` | 3 | Three independent blocks: sequence, structure, conditions. |
-| `asyn.splits` | guardrails | Leave-one-study-out + **fold-local** impute/scale/encode. |
-| `asyn.decompose` | 4 | Mixed-effects study ICC + nested-CV R² per block set. **Main result.** |
-| `asyn.predict` | 5 | Nested LOSO predictor, three baselines, bootstrap CIs. |
-| `asyn.report` | 2/4/5/6 | The four figures. |
-| `asyn.pipeline` | — | One-command rerun → `reports/results.md`. |
+| `data/conditions_familial.csv` | Tables S7–S10 (mutant × condition) | 77 |
+| `data/type_scores.csv` | Tables S3–S6 (mutation type × region) | 104 |
 
-## Methodology guardrails (enforced in code)
-- **Split by study, not by row** — `LeaveOneGroupOut` on `study`; a leakage
-  assert is in the tests.
-- **Scale inside the fold** — every transform is in the sklearn `Pipeline`;
-  tested that the scaler uses train stats only.
-- **Nested CV** — inner `GroupKFold` tunes, outer loop scores.
-- **Three baselines, always** — mean / existing-tool score / one feature.
-- **Bootstrap CIs over studies** — on every reported metric.
-- **No neural network** — n ≈ 130; the default estimator is a small forest.
-- **Pre-registered** — see `preregistration.md`, committed before Phase 4.
+The PDF's label column is a CID-mapped font with no Unicode table, and **the
+numeric glyph offset differs between pages** (S5/S6 vs S7–S10) — a fixed map
+silently decodes `1.000` as `20111`. So the ingesters calibrate the offset per
+page, read columns positionally, bounds-check every value, and assert 9 values
+read off the rendered pages. Drift fails loudly rather than producing plausible
+garbage. No value is transcribed by hand into the data.
 
-## Limitations
-- Outcome is T½, which conflates nucleation and elongation (Ohgita et al. 2022
-  separate them).
-- The structure block carries only `in_fibril_core` until a DSSP-derived
-  `data/structure_features.csv` (from PDB 6CU7/6A6B) is supplied.
-- The existing-tool baseline needs a `tool_score` column (TANGO/WALTZ/AGGRESCAN
-  output) added to the data.
+```bash
+make setup                      # pip install -e .[dev]
+python -m asyn.ingest_si        # Tables S7–S10  -> conditions_familial.csv
+python -m asyn.ingest_types     # Tables S3–S6   -> type_scores.csv
+python -m asyn.si_analysis      # the decomposition
+python -m asyn.si_report        # the three figures
+make test                       # 17 tests
+```
+`data/raw/SI.pdf` is gitignored; download it from the PMC link above if you
+need to re-run extraction.
+
+## Also in here: a validated-prediction scaffold
+`asyn.features / splits / decompose / predict` implement the full
+leave-one-study-out regression pipeline from the original plan — study-grouped
+splits, fold-local preprocessing, nested CV, three baselines, bootstrap CIs, no
+neural network. **It needs raw kinetics (T½), which this SI does not contain**,
+so it currently runs on a labelled synthetic stand-in (`make all`) and produces
+no scientific result. It is kept ready for that data.
 
 ## Layout
 ```
-data/   raw/ (SI.pdf, gitignored) · aggregation_curated.csv · data_dictionary.md
-src/asyn/   the modules above
-tests/   feature/split/decompose unit tests (fast, run on synthetic data)
-reports/   results.md + figures/
-preregistration.md
+src/asyn/   ingest_si · ingest_types · si_analysis · si_report   (real)
+            features · splits · decompose · predict · synth      (T½ scaffold)
+data/       conditions_familial.csv · type_scores.csv · data_dictionary.md
+reports/figures/  si_fig1..3 (real)
+SI_FINDINGS.md · preregistration.md
 ```
