@@ -65,7 +65,7 @@ python -m asyn.ingest_si        # Tables S7–S10  -> conditions_familial.csv
 python -m asyn.ingest_types     # Tables S3–S6   -> type_scores.csv
 python -m asyn.si_analysis      # the decomposition
 python -m asyn.si_report        # the three figures
-make test                       # 19 tests
+make test                       # 20 tests
 ```
 `data/raw/SI.pdf` is gitignored; download it from the PMC link above if you
 need to re-run extraction.

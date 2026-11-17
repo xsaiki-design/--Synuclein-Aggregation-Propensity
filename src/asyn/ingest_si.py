@@ -69,6 +69,30 @@ def _row_numbers(cells) -> list[str]:
     return out
 
 
+# Values read off the rendered SI pages (S7-S10), one per table. The extraction
+# must reproduce them or the CID offset has drifted; see ingest_types for the
+# same guard on S3-S6.
+_SPOT_CHECKS = [
+    ("A30P", "buffer", "PBS", -0.75, 4),
+    ("A53T", "buffer", "Tris", 0.94, 16),
+    ("E46K", "salt", "None", 0.56, 9),
+    ("G51D", "shaking", "Fast", -1.00, 4),
+    ("A30P", "concentration", "High", -0.86, 7),
+]
+
+
+def _verify(df: pd.DataFrame) -> None:
+    for mut, dim, cat, score, sup in _SPOT_CHECKS:
+        r = df[(df.mutant == mut) & (df.dimension == dim) & (df.category == cat)]
+        if len(r) != 1:
+            raise ValueError(f"spot check missing: {mut}/{dim}/{cat}")
+        r = r.iloc[0]
+        if abs(r.score - score) > 1e-9 or int(r.support) != sup:
+            raise ValueError(
+                f"spot check failed for {mut}/{dim}/{cat}: got "
+                f"({r.score}, {r.support}), expected ({score}, {sup})")
+
+
 def build(pdf_path: Path = RAW_PDF, out: Path = OUT_CSV) -> pd.DataFrame:
     import pdfplumber
 
@@ -93,6 +117,7 @@ def build(pdf_path: Path = RAW_PDF, out: Path = OUT_CSV) -> pd.DataFrame:
                 rows.append({"mutant": mut, "dimension": dim, "category": cat,
                              "score": float(avg), "support": int(sup)})
     df = pd.DataFrame(rows)
+    _verify(df)
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
     print(f"wrote {out} ({len(df)} rows) [REAL — Tables S7–S10, verified]")

@@ -15,7 +15,8 @@ supplementary PDF.** Reading all 12 pages of Pancoe et al. 2022 SI:
 `data/conditions_familial.csv` (77 rows, 301 underlying measurements) is
 extracted from S7–S10 by `asyn.ingest_si` — numbers decoded from the PDF's own
 text layer (the font's fixed CID offset), labels read from the rendered tables,
-row counts asserted. Real, verified, no fabrication.
+row counts asserted, and 5 values checked against the rendered pages. Real,
+verified, no fabrication.
 
 ## First real result (`asyn.si_analysis`)
 Support-weighted variance explained in the aggregation score:

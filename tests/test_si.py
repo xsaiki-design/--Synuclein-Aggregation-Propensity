@@ -62,3 +62,8 @@ def test_none_category_is_not_parsed_as_missing():
     d = si_analysis.load()
     assert "None" in set(d["category"])
     assert d["category"].isna().sum() == 0
+
+
+def test_conditions_data_matches_rendered_pages():
+    from asyn import ingest_si
+    ingest_si._verify(si_analysis.load())  # raises on CID drift
