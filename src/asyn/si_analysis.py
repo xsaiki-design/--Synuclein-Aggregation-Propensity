@@ -30,7 +30,9 @@ DATA = Path("data/conditions_familial.csv")
 
 
 def load(path: Path = DATA) -> pd.DataFrame:
-    df = pd.read_csv(path)
+    # "None" is a real category (no added salt, no shaking) and is in pandas'
+    # default NA list, so it must not be parsed as missing.
+    df = pd.read_csv(path, keep_default_na=False, na_values=[""])
     return df[df["support"] > 0].copy()  # a cell with n=0 carries no measurement
 
 

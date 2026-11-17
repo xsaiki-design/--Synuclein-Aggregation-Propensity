@@ -54,3 +54,11 @@ def test_condition_category_is_below_its_chance_level():
     assert row["r2_mutant"] > row["chance_mutant"]       # sequence beats chance
     assert row["r2_category"] < row["chance_category"]   # conditions do not
     assert row["p_mutant"] < 0.05
+
+
+def test_none_category_is_not_parsed_as_missing():
+    """'None' (no added salt / no shaking) is a real level and is in pandas'
+    default NA list; losing it silently shrank the category model."""
+    d = si_analysis.load()
+    assert "None" in set(d["category"])
+    assert d["category"].isna().sum() == 0
