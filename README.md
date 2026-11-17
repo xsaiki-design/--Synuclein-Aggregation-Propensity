@@ -12,9 +12,13 @@ Everything below is extracted from that PDF and verified against it — see
 
 ## Results
 
-**1. Sequence dominates conditions.** Across the 7 familial mutants, *which
-mutant* explains ~86% of the variance in aggregation score; *which condition
-category* (buffer / salt / shaking / concentration) explains ~4%.
+**1. Sequence explains the score; condition category carries no signal.**
+Across the 7 familial mutants, *which mutant* explains ~86% of the variance in
+aggregation score against a shuffled-label chance level of ~10% (p = 0.001);
+*which condition category* (buffer / salt / shaking / concentration) explains
+~4% against a chance level of ~18% — i.e. **below chance**. The chance levels
+matter: mutant is a 5-df factor on 14–19 cells, so raw R² alone would overstate
+the contrast. Every factor is tested against its own permutation null.
 
 ![variance explained](reports/figures/si_fig1_variance.png)
 
@@ -61,7 +65,7 @@ python -m asyn.ingest_si        # Tables S7–S10  -> conditions_familial.csv
 python -m asyn.ingest_types     # Tables S3–S6   -> type_scores.csv
 python -m asyn.si_analysis      # the decomposition
 python -m asyn.si_report        # the three figures
-make test                       # 17 tests
+make test                       # 18 tests
 ```
 `data/raw/SI.pdf` is gitignored; download it from the PMC link above if you
 need to re-run extraction.

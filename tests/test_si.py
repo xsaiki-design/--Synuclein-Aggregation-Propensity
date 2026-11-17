@@ -28,7 +28,7 @@ def test_sequence_explains_more_than_conditions():
 
 def test_si_report_writes_figures():
     from asyn import si_report
-    paths = si_report.run()
+    paths = si_report.run(n_perm=50)  # figures only; rigour lives in the CLI run
     assert len(paths) >= 2 and all(p.exists() and p.stat().st_size > 1000 for p in paths)
 
 
@@ -45,3 +45,12 @@ def test_nac_is_the_most_aggregation_critical_region():
     d = si_analysis.load_types()
     m = si_analysis.domain_means(d).set_index("scope")["weighted_mean_score"]
     assert m["NAC"] < m["C-terminus"] < m["N-terminus"]
+
+
+def test_condition_category_is_below_its_chance_level():
+    """The corrected claim: conditions carry no signal, not merely less signal."""
+    t = si_analysis.permutation_test(si_analysis.load(), n_perm=200, seed=1)
+    row = t[t.dimension == "ALL (pooled)"].iloc[0]
+    assert row["r2_mutant"] > row["chance_mutant"]       # sequence beats chance
+    assert row["r2_category"] < row["chance_category"]   # conditions do not
+    assert row["p_mutant"] < 0.05

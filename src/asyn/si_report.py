@@ -22,23 +22,33 @@ FIG_DIR = Path("reports/figures")
 SEQ_C, COND_C = "#205493", "#d96d2b"
 
 
-def fig_variance(ve) -> Path:
-    d = ve[ve.dimension != "ALL (pooled)"].copy()
+def fig_variance(perm) -> Path:
+    """Observed variance explained, each factor against its own chance level.
+
+    The chance marks matter: with 5 degrees of freedom on ~16 cells a random
+    mutant factor already reaches ~0.4, so the bars alone would overstate the
+    contrast.
+    """
+    d = perm[perm.dimension != "ALL (pooled)"].copy()
     x = np.arange(len(d))
-    fig, ax = plt.subplots(figsize=(7.2, 4.2))
-    ax.bar(x - 0.19, d["r2_sequence_mutant"], 0.38,
-           label="sequence (which mutant)", color=SEQ_C)
-    ax.bar(x + 0.19, d["r2_conditions_category"], 0.38,
-           label="conditions (which category)", color=COND_C)
+    fig, ax = plt.subplots(figsize=(7.8, 4.6))
+    ax.bar(x - 0.19, d["r2_mutant"], 0.38, label="sequence (which mutant)", color=SEQ_C)
+    ax.bar(x + 0.19, d["r2_category"], 0.38, label="conditions (which category)",
+           color=COND_C)
+    for xi, (cm, cc) in enumerate(zip(d["chance_mutant"], d["chance_category"])):
+        ax.hlines(cm, xi - 0.38, xi, color="k", lw=1.6, ls="--")
+        ax.hlines(cc, xi, xi + 0.38, color="k", lw=1.6, ls="--")
+    ax.plot([], [], "k--", lw=1.6, label="chance level (shuffled labels)")
+    for xi, (a, b, pm) in enumerate(zip(d["r2_mutant"], d["r2_category"], d["p_mutant"])):
+        ax.text(xi - 0.19, a + 0.02, f"{a:.2f}", ha="center", fontsize=9)
+        ax.text(xi + 0.19, b + 0.02, f"{b:.2f}", ha="center", fontsize=9)
+        ax.text(xi - 0.19, a - 0.07, f"p={pm:.3f}", ha="center", fontsize=7.5, color="white")
     ax.set_xticks(x)
     ax.set_xticklabels(d["dimension"])
     ax.set_ylabel("variance explained (support-weighted $R^2$)")
-    ax.set_ylim(0, 1)
-    ax.set_title("Aggregation score: sequence explains it, conditions barely move it")
-    ax.legend(frameon=False)
-    for xi, (a, b) in enumerate(zip(d["r2_sequence_mutant"], d["r2_conditions_category"])):
-        ax.text(xi - 0.19, a + 0.02, f"{a:.2f}", ha="center", fontsize=9)
-        ax.text(xi + 0.19, b + 0.02, f"{b:.2f}", ha="center", fontsize=9)
+    ax.set_ylim(0, 1.08)
+    ax.set_title("Mutant identity beats chance; condition category does not")
+    ax.legend(frameon=False, fontsize=8.5, loc="upper right")
     return _save(fig, "si_fig1_variance.png")
 
 
@@ -77,10 +87,12 @@ def _save(fig, name) -> Path:
     return out
 
 
-def run() -> list[Path]:
-    res = si_analysis.run()
+def run(n_perm: int = 1000) -> list[Path]:
     df = si_analysis.load()
-    figs = [fig_variance(res["variance_explained"]), fig_scores_by_mutant(df)]
+    perm = si_analysis.permutation_test(df, n_perm=n_perm)
+    Path("reports").mkdir(exist_ok=True)
+    perm.to_csv("reports/permutation_test.csv", index=False)
+    figs = [fig_variance(perm), fig_scores_by_mutant(df)]
     types = si_analysis.TYPES_CSV
     if types.exists():
         figs.append(fig_type_by_domain(si_analysis.type_by_domain(si_analysis.load_types())))

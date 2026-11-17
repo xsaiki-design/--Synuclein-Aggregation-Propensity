@@ -20,13 +20,27 @@ row counts asserted. Real, verified, no fabrication.
 ## First real result (`asyn.si_analysis`)
 Support-weighted variance explained in the aggregation score:
 
-| dimension | mutant (sequence) R² | condition R² |
-|---|---|---|
-| buffer | 0.94 | 0.05 |
-| concentration | 0.83 | 0.07 |
-| salt | 0.88 | 0.14 |
-| shaking | 0.84 | 0.03 |
-| **pooled** | **0.86** | **0.04** |
+| dimension | mutant R² | *chance* | p | condition R² | *chance* |
+|---|---|---|---|---|---|
+| buffer | 0.94 | *0.38* | 0.002 | 0.05 | *0.16* |
+| concentration | 0.83 | *0.39* | 0.005 | 0.07 | *0.17* |
+| salt | 0.88 | *0.45* | 0.013 | 0.14 | *0.19* |
+| shaking | 0.83 | *0.36* | 0.004 | 0.03 | *0.18* |
+| **pooled** | **0.86** | *0.10* | **0.001** | **0.04** | *0.18* |
+
+**Raw R² alone would overstate this, and the chance columns are why.** Mutant
+is a 5-degree-of-freedom factor and a condition category has 1–2, on only
+14–19 cells, so the larger factor explains more variance mechanically: a
+*randomly shuffled* mutant label already reaches R² ≈ 0.4 per dimension. Each
+factor is therefore compared against its own permutation null
+(`asyn.si_analysis.permutation_test`, 1000 shuffles; `reports/permutation_test.csv`).
+
+Against that baseline the result is cleaner than the raw numbers suggested:
+mutant identity beats chance in every dimension (p ≤ 0.013; pooled p = 0.001),
+while **condition category lands *below* its own chance level everywhere**
+(0.03–0.14 observed against 0.16–0.19 expected, all p ≥ 0.46). Condition
+category carries no detectable signal at all — it does not merely lose to
+sequence.
 
 ![variance explained](reports/figures/si_fig1_variance.png)
 
@@ -43,7 +57,8 @@ Conditions can flip an individual reading even where they explain little
 variance overall. The authors' own example: A30P scores −0.75 in PBS vs −0.31 in Tris,
 but averaged PBS→Tris is −0.12 ± 0.31 — no generalizable buffer effect.
 
-**Conclusion (for this dataset): sequence dominates conditions** — the opposite
+**Conclusion (for this dataset): which mutation it is explains the aggregation
+score; which condition category it was measured under does not** — the opposite
 of the plan's hypothesis that conditions would swamp sequence. A legitimate,
 reportable negative result.
 

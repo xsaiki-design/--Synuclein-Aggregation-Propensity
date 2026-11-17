@@ -149,3 +149,37 @@ def type_by_domain(df: pd.DataFrame) -> pd.DataFrame:
     d = df[df["type"].isin(TRANSITIONS) & df["scope"].isin(DOMAINS)]
     return d.pivot(index="type", columns="scope", values="average").reindex(
         TRANSITIONS)[DOMAINS]
+
+
+def permutation_test(df: pd.DataFrame, n_perm: int = 1000, seed: int = 0) -> pd.DataFrame:
+    """Compare each factor's R² with the R² it reaches on shuffled labels.
+
+    Raw R² is not comparable between the two factors here: mutant has 5 degrees
+    of freedom against a category's 1-2, on only 14-19 cells, so the bigger
+    factor explains more variance mechanically. Permuting the labels gives each
+    factor its own chance baseline, which is the fair comparison.
+    """
+    rng = np.random.default_rng(seed)
+    rows = []
+    for dim, g in list(df.groupby("dimension")) + [("ALL (pooled)", df)]:
+        obs_m = _wls_r2(g, "score ~ C(mutant)")
+        obs_c = _wls_r2(g, "score ~ C(category)")
+        null_m, null_c = [], []
+        for _ in range(n_perm):
+            h = g.copy()
+            h["mutant"] = rng.permutation(h["mutant"].values)
+            h["category"] = rng.permutation(h["category"].values)
+            null_m.append(_wls_r2(h, "score ~ C(mutant)"))
+            null_c.append(_wls_r2(h, "score ~ C(category)"))
+        null_m, null_c = np.array(null_m), np.array(null_c)
+        rows.append({
+            "dimension": dim,
+            "n_cells": len(g),
+            "r2_mutant": round(obs_m, 3),
+            "chance_mutant": round(float(null_m.mean()), 3),
+            "p_mutant": round(float((np.sum(null_m >= obs_m) + 1) / (n_perm + 1)), 4),
+            "r2_category": round(obs_c, 3),
+            "chance_category": round(float(null_c.mean()), 3),
+            "p_category": round(float((np.sum(null_c >= obs_c) + 1) / (n_perm + 1)), 4),
+        })
+    return pd.DataFrame(rows)
