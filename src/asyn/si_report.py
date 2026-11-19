@@ -29,7 +29,7 @@ def fig_variance(perm) -> Path:
     mutant factor already reaches ~0.4, so the bars alone would overstate the
     contrast.
     """
-    d = perm[perm.dimension != "ALL (pooled)"].copy()
+    d = perm.copy()
     x = np.arange(len(d))
     fig, ax = plt.subplots(figsize=(7.8, 4.6))
     ax.bar(x - 0.19, d["r2_mutant"], 0.38, label="sequence (which mutant)", color=SEQ_C)

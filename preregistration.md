@@ -66,3 +66,10 @@ sequence, it falls *below* its own chance level.
 requirement was written for the Phase 5 predictor. With 6 mutants, resampling
 clusters frequently yields rank-deficient designs, so the permutation test is
 reported in its place rather than a fragile interval.
+
+**5. Withdrew a pooled result (pseudo-replication).** An earlier pass pooled all
+four condition tables into one test (R² 0.86 vs 0.10 chance, p = 0.001). The
+tables partition the *same* experiments by four different attributes, so
+pooling counted each experiment up to four times. Results are now reported per
+table only (p = 0.002–0.013 for mutant identity), and the tables are treated as
+consistent views of one dataset rather than independent replications.

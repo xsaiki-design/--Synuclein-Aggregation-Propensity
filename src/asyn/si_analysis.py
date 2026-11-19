@@ -1,6 +1,6 @@
 """The real sequence-vs-conditions analysis, on the data this SI supports.
 
-For the 7 familial mutants, each condition table gives an aggregation score per
+For the 6 familial mutants, each condition table gives an aggregation score per
 (mutant × condition category) with a support count. The question "how much is
 sequence vs. conditions" becomes, at this level:
 
@@ -42,9 +42,14 @@ def _wls_r2(df: pd.DataFrame, formula: str) -> float:
 
 
 def variance_explained(df: pd.DataFrame) -> pd.DataFrame:
-    """Per dimension and pooled: weighted R² for mutant / condition / both."""
+    """Per condition table: weighted R² for mutant / condition / both.
+
+    There is deliberately no pooled row. The four tables are four partitions of
+    the SAME experiments (each one has a buffer, a salt, a shaking speed and a
+    concentration), so stacking them counts each experiment up to four times.
+    """
     rows = []
-    for dim, g in list(df.groupby("dimension")) + [("ALL (pooled)", df)]:
+    for dim, g in df.groupby("dimension"):
         if g["category"].nunique() < 2 or g["mutant"].nunique() < 2:
             continue
         r_mut = _wls_r2(g, "score ~ C(mutant)")
@@ -163,7 +168,7 @@ def permutation_test(df: pd.DataFrame, n_perm: int = 1000, seed: int = 0) -> pd.
     """
     rng = np.random.default_rng(seed)
     rows = []
-    for dim, g in list(df.groupby("dimension")) + [("ALL (pooled)", df)]:
+    for dim, g in df.groupby("dimension"):
         obs_m = _wls_r2(g, "score ~ C(mutant)")
         obs_c = _wls_r2(g, "score ~ C(category)")
         null_m, null_c = [], []

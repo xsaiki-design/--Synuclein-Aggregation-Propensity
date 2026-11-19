@@ -5,7 +5,7 @@ What this SI actually contains (confirmed by reading all 12 pages):
     (reduces / no effect / accelerates, normalised to the WT control) — NOT a
     continuous T½. T½ is not tabulated in this file.
   * Tables S3–S6 give scores averaged by mutation *type* and domain.
-  * Tables S7–S10 give scores for the 7 familial mutants × condition category
+  * Tables S7–S10 give scores for the 6 familial mutants × condition category
     (buffer / salt / shaking speed / αS concentration), each with a support n.
     These are the only per-(variant × condition) data in the file, so they are
     the conditions-vs-sequence dataset.

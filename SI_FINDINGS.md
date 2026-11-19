@@ -7,7 +7,7 @@ supplementary PDF.** Reading all 12 pages of Pancoe et al. 2022 SI:
 - The outcome is a **categorical aggregation score** in {−1, 0, +1} (reduces /
   no effect / accelerates), **normalized to the WT control**. No continuous T½.
 - Tables **S3–S6**: scores averaged by mutation *type* and domain.
-- Tables **S7–S10**: scores for the 7 familial mutants (A30P, E46K, H50Q, G51D,
+- Tables **S7–S10**: scores for the 6 familial mutants (A30P, E46K, H50Q, G51D,
   A53E, A53T) × condition category (buffer / salt / shaking / αS concentration),
   each with a support count. **This is the only per-(variant × condition) data
   in the file**, so it is the sequence-vs-conditions dataset.
@@ -27,7 +27,6 @@ Support-weighted variance explained in the aggregation score:
 | concentration | 0.83 | *0.39* | 0.005 | 0.07 | *0.17* |
 | salt | 0.88 | *0.45* | 0.013 | 0.08 | *0.21* |
 | shaking | 0.83 | *0.36* | 0.004 | 0.03 | *0.23* |
-| **pooled** | **0.86** | *0.10* | **0.001** | **0.03** | *0.18* |
 
 **Raw R² alone would overstate this, and the chance columns are why.** Mutant
 is a 5-degree-of-freedom factor and a condition category has 1–2, on only
@@ -45,11 +44,22 @@ bug favoured the conclusion. Fixed; both models now use all 66 cells, and the
 finding holds (salt's condition R² moves 0.14 → 0.08).
 
 Against that baseline the result is cleaner than the raw numbers suggested:
-mutant identity beats chance in every dimension (p ≤ 0.013; pooled p = 0.001),
+mutant identity beats chance in every table (p = 0.002–0.013),
 while **condition category lands *below* its own chance level everywhere**
 (0.03–0.08 observed against 0.16–0.23 expected, all p ≥ 0.71). Condition
 category carries no detectable signal at all — it does not merely lose to
 sequence.
+
+**Why there is no pooled row.** An earlier version reported a pooled result
+(R² 0.86 against a 0.10 chance level, p = 0.001). It was invalid. Every
+experiment has a buffer *and* a salt *and* a shaking speed *and* a
+concentration, so the four tables are four partitions of the **same**
+experiments — A30P's buffer cells total 23 measurements and its salt cells total
+the same 23. Stacking the tables counted each experiment up to four times (301
+summed support against at most 93 in any one table), which is what drove that
+pooled chance level down and its p-value to the floor. The four tables are
+therefore four consistent views of one dataset, not four independent
+replications, and their p-values cannot be combined either.
 
 ![variance explained](reports/figures/si_fig1_variance.png)
 

@@ -13,12 +13,14 @@ Everything below is extracted from that PDF and verified against it — see
 ## Results
 
 **1. Sequence explains the score; condition category carries no signal.**
-Across the 7 familial mutants, *which mutant* explains ~86% of the variance in
-aggregation score against a shuffled-label chance level of ~10% (p = 0.001);
-*which condition category* (buffer / salt / shaking / concentration) explains
-~3% against a chance level of ~18% — i.e. **below chance**. The chance levels
-matter: mutant is a 5-df factor on 14–19 cells, so raw R² alone would overstate
-the contrast. Every factor is tested against its own permutation null.
+Across the 6 familial mutants, *which mutant* explains 83–94% of the variance
+in aggregation score in each condition table, against a shuffled-label chance
+level of 36–45% (p = 0.002–0.013). *Which condition category* explains 3–8%,
+against a chance level of 16–23% — i.e. **below chance in every table**. The
+chance levels matter: mutant is a 5-df factor on 14–19 cells, so raw R² alone
+would overstate the contrast. Each table is tested on its own: the four tables
+are four partitions of the *same* experiments, so pooling them would count each
+experiment up to four times.
 
 ![variance explained](reports/figures/si_fig1_variance.png)
 

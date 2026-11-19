@@ -21,9 +21,9 @@ def test_a30p_buffer_matches_paper():
 
 
 def test_sequence_explains_more_than_conditions():
-    ve = si_analysis.run()["variance_explained"].set_index("dimension")
-    row = ve.loc["ALL (pooled)"]
-    assert row["r2_sequence_mutant"] > row["r2_conditions_category"]
+    ve = si_analysis.run()["variance_explained"]
+    assert set(ve["dimension"]) == {"buffer", "salt", "shaking", "concentration"}
+    assert (ve["r2_sequence_mutant"] > ve["r2_conditions_category"]).all()
 
 
 def test_si_report_writes_figures():
@@ -50,10 +50,10 @@ def test_nac_is_the_most_aggregation_critical_region():
 def test_condition_category_is_below_its_chance_level():
     """The corrected claim: conditions carry no signal, not merely less signal."""
     t = si_analysis.permutation_test(si_analysis.load(), n_perm=200, seed=1)
-    row = t[t.dimension == "ALL (pooled)"].iloc[0]
-    assert row["r2_mutant"] > row["chance_mutant"]       # sequence beats chance
-    assert row["r2_category"] < row["chance_category"]   # conditions do not
-    assert row["p_mutant"] < 0.05
+    # checked per table: the tables share experiments, so there is no valid pool
+    assert (t["r2_mutant"] > t["chance_mutant"]).all()       # sequence beats chance
+    assert (t["r2_category"] < t["chance_category"]).all()   # conditions do not
+    assert (t["p_mutant"] < 0.05).all()
 
 
 def test_none_category_is_not_parsed_as_missing():
