@@ -1,41 +1,115 @@
-# Data dictionary — `aggregation_curated.csv`
+# Data dictionary
 
-One row per *reported aggregation experiment*. Built from the open-access
-supplementary tables of **Pancoe et al. 2022** (J Mol Biol 434(23):167859,
+Source for everything real in this repo: the open-access supplementary tables of
+**Pancoe et al. 2022** (*J Mol Biol* 434(23):167859,
 [PMC9922159](https://pmc.ncbi.nlm.nih.gov/articles/PMC9922159)), whose authors
-explicitly intended the tabulated data for computational reuse.
+tabulated these data for computational reuse.
 
-The tabulated outcome is **T½** — the time to half-maximal ThT fluorescence.
-Note for the write-up: T½ conflates nucleation and elongation into one number;
-papers that separate those phases (e.g. Ohgita et al. 2022) are a known
-limitation of using a single half-time as the outcome.
+**The outcome in this source is a categorical aggregation score**, not a
+continuous rate:
+
+| value | meaning |
+|---|---|
+| `-1` | the change *reduces* aggregation |
+| `0` | no effect |
+| `+1` | the change *accelerates* aggregation |
+
+Scores are **normalised to a matched WT control in the same study**, and the
+tabulated figures are *averages* of that score over a group of experiments. T½
+(time to half-maximal ThT fluorescence) is **not tabulated in this SI** — see
+"The T½ scaffold" at the bottom.
+
+---
+
+## `conditions_familial.csv` — Tables S7–S10 (77 rows)
+One row per (familial mutant × condition category). Built by `asyn.ingest_si`.
 
 | Column | Type | Meaning |
 |---|---|---|
-| `variant` | str | Mutation in WT-position-MUT form (`A30P`), or `WT`. |
-| `study` | str | The paper/lab the row was measured in. **The grouping key** for leave-one-study-out validation. |
-| `position` | int | 1-based residue number; empty for WT. |
-| `wt_residue` | str | Wild-type residue (1-letter); empty for WT. |
-| `mut_residue` | str | Mutant residue (1-letter); empty for WT. |
-| `t_half_h` | float | **Outcome.** Time to half-maximal ThT signal, hours. |
-| `t_half_rel_wt` | float | `t_half_h` normalised to the WT control measured in the same study. |
-| `pH` | float | Assay pH. |
-| `temperature_C` | float | Assay temperature (°C). |
-| `protein_conc_uM` | float | Monomer concentration (µM). |
-| `agitation` | str | `quiescent` / `shaking` / `beads`. |
-| `buffer` | str | Buffer system (e.g. PBS, Tris, phosphate). |
-| `seeds` | 0/1 | Pre-formed fibril seeds added. |
-| `lipids` | 0/1 | Lipid/membrane present. |
-| `ThT_conc_uM` | float | Thioflavin T concentration (µM). |
-| `synthetic` | 0/1 | **Present only in the stand-in.** `1` ⇒ generated, not real. |
+| `mutant` | str | One of the 6 familial mutants: A30P, E46K, H50Q, G51D, A53E, A53T. |
+| `dimension` | str | Which condition table the row came from: `buffer`, `salt`, `shaking`, `concentration`. |
+| `category` | str | The level within that dimension — see below. |
+| `score` | float | Mean aggregation score for that cell, in [−1, +1]. |
+| `support` | int | Number of underlying experiments averaged into `score`. |
 
-**Missing conditions are data.** If a paper does not report a condition for a
-row, that cell stays empty (NaN) — never imputed at curation time, and the
-frequency of missingness is itself reported.
+Categories by dimension:
 
-## Provenance / target variable
-- Outcome metric and its caveat: T½ (half-time), conflates nucleation +
-  elongation. Separate-phase kinetics: Ohgita et al. 2022 (PMC9043213).
+| dimension | levels |
+|---|---|
+| `buffer` | `PBS`, `Tris`, `Other` |
+| `salt` | `High`, `Low`, `None` |
+| `shaking` | `Fast`, `Medium`, `Slow`, `None` |
+| `concentration` | `High`, `Normal`, `Low` |
+
+> **`"None"` is a real level**, meaning *no added salt* or *no shaking* — not a
+> missing value. It is in pandas' default NA list, so it must be read with
+> `keep_default_na=False` or those 12 rows silently vanish. `asyn.si_analysis.load`
+> does this; a regression test guards it.
+
+> **The four dimensions are not independent samples.** Every experiment has a
+> buffer *and* a salt *and* a shaking speed *and* a concentration, so these are
+> four partitions of the *same* experiments. A30P's buffer cells total 23
+> measurements and its salt cells total the same 23. Never pool the four tables
+> — that counts each experiment up to four times. Analyse per dimension.
+
+`support = 0` means the SI printed no measurements for that cell; such rows are
+filtered out before analysis rather than treated as a score of zero.
+
+---
+
+## `type_scores.csv` — Tables S3–S6 (104 rows)
+One row per (sequence region × mutation type). Built by `asyn.ingest_types`.
+
+| Column | Type | Meaning |
+|---|---|---|
+| `scope` | str | `whole_protein` (S3), `N-terminus` (S4), `NAC` (S5), `C-terminus` (S6). |
+| `type` | str | Mutation type, e.g. `X -> Pro`, `Sm -> Lg`, `nβ -> β`, or a same-class `… Cntrl` row. |
+| `average` | float | Mean aggregation score in [−1, +1]; empty when `support` is 0. |
+| `sd` | float | Standard deviation of that mean; empty when `support` is 0. |
+| `support` | int | Number of underlying experiments. |
+
+Region boundaries follow the SI: N-terminus 1–60, NAC 61–95, C-terminus 96–140.
+The 26 `type` values are the same list, in the same order, in all four tables —
+16 substitution transitions plus 10 same-class control rows.
+
+### Extraction integrity
+Both CSVs are decoded from the PDF's own text layer, not transcribed by hand.
+The label column uses a CID-mapped font with no Unicode table, and **the numeric
+glyph offset differs between pages** (S5/S6 vs S7–S10) — a fixed map decodes
+`1.000` as `20111`. So the ingesters:
+
+1. calibrate the glyph offset **per page**, rejecting any offset that yields a
+   value outside known bounds (score ∈ [−1,1], sd ∈ [0,1], support a
+   non-negative integer);
+2. read the columns **positionally**, because the label column leaks digits;
+3. assert values read off the rendered pages — **5** spot checks in
+   `ingest_si`, **9** in `ingest_types` — on every build.
+
+A future font or layout change fails loudly instead of producing plausible
+garbage.
+
+---
+
+## The T½ scaffold — `aggregation_curated.csv` (not real data)
+`asyn.features / splits / decompose / predict` implement a leave-one-study-out
+regression pipeline whose outcome is continuous **T½ in hours**, one row per
+individual experiment with its own conditions. **No such table exists in this
+SI**, so that pipeline runs only on a labelled synthetic stand-in
+(`asyn.synth`, `synthetic=1`, `make data-synth`) and produces no scientific
+result. It is kept ready for raw kinetics if that data is obtained.
+
+Its schema: `variant`, `study`, `position`, `wt_residue`, `mut_residue`,
+`t_half_h`, `t_half_rel_wt`, plus per-row conditions (`pH`, `temperature_C`,
+`protein_conc_uM`, `agitation`, `buffer`, `seeds`, `lipids`, `ThT_conc_uM`).
+`study` is the grouping key for leave-one-study-out validation.
+
+If that data is ever obtained, note that T½ conflates nucleation and elongation
+into one number; Ohgita et al. 2022 ([PMC9043213](https://pmc.ncbi.nlm.nih.gov/articles/PMC9043213))
+separate those phases. **Missing conditions are data** — a condition a paper
+does not report stays NaN rather than being imputed at curation time, and the
+frequency of missingness is reported.
+
+## Other provenance
 - Canonical sequence for feature construction: UniProt **P37840**, 140 aa.
 - Fibril structure features (optional block): PDB **6CU7 / 6A6B** via DSSP →
   `data/structure_features.csv` (`position, sasa, ss_sheet`). Without it, the
