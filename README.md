@@ -15,7 +15,7 @@ Everything below is extracted from that PDF and verified against it — see
 **1. Sequence explains the score; condition category carries no signal.**
 Across the 6 familial mutants, *which mutant* explains 83–94% of the variance
 **among condition-category means**, against a shuffled-label chance level of
-36–45% (p = 0.002–0.013). That figure is an **upper bound**: each point is
+36–45% (p = 0.002–0.013, uncorrected across 8 tests — 4 dimensions × 2 factors). That figure is an **upper bound**: each point is
 already an average of up to 16 experiments, so disagreement inside a cell is
 removed before the variance is computed. At the level of individual reported
 experiments the same model explains **at least 51–58%**
@@ -40,11 +40,12 @@ region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. Withi
 NAC the strongest substitution is **X → Pro (−0.941, n=17)** — the
 β-sheet-breaking effect the fibril model predicts, recovered from the data.
 
-Ranked *within* each region, the strongest effects differ in sign: N-terminus
-**nβ → β +1.00** (n=5), NAC **X → Pro −0.94** (n=17), C-terminus **B → nB
-−1.00** (n=7). The whole-protein figure often quoted for X → Pro (−0.88, n=33)
-aggregates 16 N-terminal and 17 NAC measurements and **none** from the
-C-terminus, so it is not a regional result.
+The whole-protein figure often quoted for X → Pro (−0.88, n=33) aggregates 16
+N-terminal and 17 NAC measurements and **none** from the C-terminus, so it is
+not a regional result. Per-region rankings exist (`region_ranking()`) but only
+the NAC row is quotable: the N-terminus and C-terminus leaders are the maximum
+of 5–7 candidates and both land on exactly ±1.000 with sd = 0 at n = 5 and 7 —
+order statistics of a small sample, not effect estimates.
 
 ![type by domain](reports/figures/si_fig3_type_by_domain.png)
 
@@ -70,11 +71,14 @@ studies, not as a rate: at n=4 the split is not distinguishable from chance
 > the NAC and X → Pro findings rest on Pancoe alone — no second source yet
 > covers a NAC or C-terminal variant.
 
-**4. The literature is unanimous about proline and deadlocked about bulk.**
+**4. The published record is unanimous about proline and deadlocked about bulk.**
 Each group's mean, SD and count recover the underlying vote exactly. **No
-experiment anywhere reports X → Pro accelerating aggregation** (0 vs 29), while
-nB → B splits 5–5 and nP → P splits 5–4. The reconstruction doubles as a third
-extraction check: counts come back as whole experiments (error < 0.03).
+published experiment reports X → Pro accelerating aggregation** (0 vs 29),
+while nB → B splits 5–5 and nP → P splits 5–4. These are counts of *published*
+reports: a result matching a strong prior is easier to publish, so unanimity is
+consistent with a real effect, selective publication, or both. The
+reconstruction doubles as a third extraction check (counts recover as whole
+experiments, error < 0.03).
 
 ![vote split](reports/figures/si_fig4_vote_split.png)
 

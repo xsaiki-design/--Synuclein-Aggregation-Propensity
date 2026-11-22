@@ -170,3 +170,24 @@ def test_reported_r2_is_an_upper_bound():
     assert (b["r2_cell_means"] > b["r2_experiment_lower"]).all()
     assert (b["r2_experiment_lower"] < 0.6).all()
     assert (b["r2_cell_means"] >= 0.82).all()
+
+
+def test_by_region_excludes_the_nested_whole_protein_row():
+    """whole_protein is the sum of the three regions; listing it invites
+    double counting (verified: exact for all 26 types)."""
+    from asyn import discordance
+    scopes = set(discordance.by_region()["scope"])
+    assert scopes == {"N-terminus", "NAC", "C-terminus"}
+
+
+def test_whole_protein_is_the_sum_of_the_regions():
+    t = si_analysis.load_types()
+    w = t[t.scope == "whole_protein"].set_index("type")["support"]
+    r = t[t.scope != "whole_protein"].groupby("type")["support"].sum()
+    assert (w.sort_index() == r.sort_index()).all()
+
+
+def test_dispersion_ratio_is_gone():
+    """score() misread extreme means as contested; vote_split replaces it."""
+    from asyn import discordance
+    assert not hasattr(discordance, "score")

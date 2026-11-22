@@ -121,11 +121,17 @@ as regional results.** X → Pro's 33 measurements split 16 in the N-terminus an
 simply untested there. Ranked within each region (support floor n ≥ 5,
 `asyn.si_analysis.strongest_by_region`):
 
-| region | strongest substitution | score | sd | n |
+| region | top-ranked substitution | score | sd | n |
 |---|---|---|---|---|
-| N-terminus | nβ → β | **+1.000** | 0.000 | 5 |
-| NAC | X → Pro | **−0.941** | 0.235 | 17 |
-| C-terminus | B → nB | **−1.000** | 0.000 | 7 |
+| N-terminus | nβ → β | +1.000 | 0.000 | 5 |
+| NAC | **X → Pro** | **−0.941** | 0.235 | **17** |
+| C-terminus | B → nB | −1.000 | 0.000 | 7 |
+
+**Only the NAC row should be quoted as a result.** The other two are the
+maximum of 5–7 ranked candidates, and the maximum of a small sample is biased
+away from zero: both land on exactly ±1.000 with sd = 0 on n = 5 and n = 7.
+They are order statistics, not effect estimates. `region_ranking()` prints
+every candidate so the selection is visible.
 
 The regional view carries information the aggregate loses: **the N-terminus's
 strongest effect accelerates aggregation, while the NAC's and C-terminus's
@@ -176,9 +182,14 @@ or SD would fail both.
 | X → Pro, N-terminus | **0** | 3 | **13** |
 | X → PG, NAC | **0** | 2 | **16** |
 
-**Not one experiment anywhere reports a proline substitution accelerating
-aggregation.** That is a stronger statement than the −0.88 mean, and it
-survives the discordance check that other findings fail.
+**No published experiment in this compilation reports a proline substitution
+accelerating aggregation.** That is a stronger statement than the −0.88 mean.
+
+**It is a count of published reports, not of experiments performed.** A result
+matching a strong prior expectation — proline breaks β-sheet geometry — is
+easier to publish than a null or contradictory one, so 0 of 33 is consistent
+with a real effect, with selective publication, or with both. This data cannot
+separate them, and no correction is possible without the unpublished record.
 
 ### What the field is deadlocked about
 
@@ -198,15 +209,26 @@ sequence change alone evidently does not determine the outcome.
 
 ### A regional asymmetry
 
-Support-weighted mean discordance: **N-terminus 0.76** (4 contested, 1
-consensus) · **NAC 0.74** (3 contested, 0 consensus) · **C-terminus 0.34**
-(0 contested, 3 consensus). The field argues about the N-terminus and the NAC
-and agrees about the C-terminus — plausibly because C-terminal truncations
-produce large, unambiguous effects while NAC substitutions sit close to the
-threshold where conditions decide the sign.
+Measured on the recovered votes (minority share of directional reports,
+support-weighted), **regions only** — the whole-protein rows of Table S3 are
+the exact sum of the three regional tables for all 26 types, so including them
+would double count:
 
-**A caution on the dispersion index.** `discordance.score()` divides SD by the
-maximum attainable at that mean. It is useful for ranking, but it overstates
-disagreement at extreme means: X → Pro in the NAC scores 0.69 ("mixed") while
-the vote is 16–0–1. **Prefer `vote_split()`;** the ratio is kept only for
-ranking and is documented as secondary.
+| region | mean split | unanimous types | deadlocked types |
+|---|---|---|---|
+| N-terminus | 0.170 | 3 of 7 | 2 |
+| NAC | 0.046 | 3 of 6 | 0 |
+| C-terminus | 0.000 | 5 of 5 | 0 |
+
+The published record is divided mainly about the **N-terminus**; the NAC and
+C-terminus are close to undivided.
+
+**This corrects an earlier version of this section**, which used a dispersion
+ratio (sd ÷ the maximum attainable at that mean) and reported N-terminus 0.76,
+NAC 0.74 and C-terminus 0.34, describing the NAC as "3 contested, 0
+consensus". That was wrong: the NAC vote is 3 unanimous and 0 deadlocked. The
+ratio systematically misreads groups with extreme means — the same failure that
+labelled X → Pro in the NAC "mixed" when its vote is 16-0-1. The ratio has been
+removed from the codebase.
+
+

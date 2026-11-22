@@ -200,6 +200,13 @@ def strongest_by_region(df: pd.DataFrame, min_support: int = 5) -> pd.DataFrame:
     the N-terminus and 17 in the NAC, with none in the C-terminus. Rank within
     each region instead, and apply a support floor so a single unanimous
     measurement cannot be called the strongest effect.
+
+    SELECTION EFFECT. This returns the maximum of 5-7 ranked candidates per
+    region, and the maximum of a small sample is biased away from zero. On this
+    data the N-terminus and C-terminus winners both land on exactly +/-1.000
+    with sd = 0 at n = 5 and n = 7. Treat those as order statistics, not effect
+    estimates; only the NAC row (n = 17) has the support to be quoted. Use
+    `region_ranking` to see every candidate.
     """
     d = df[df["type"].isin(TRANSITIONS) & df["average"].notna()
            & (df["support"] >= min_support) & df["scope"].isin(DOMAINS)].copy()
