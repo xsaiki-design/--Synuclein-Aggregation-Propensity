@@ -26,8 +26,11 @@ def test_sequence_explains_more_than_conditions():
     assert (ve["r2_sequence_mutant"] > ve["r2_conditions_category"]).all()
 
 
-def test_si_report_writes_figures():
+def test_si_report_writes_figures(tmp_path, monkeypatch):
     from asyn import si_report
+    # Write into a temp dir: tests must not clobber the repo's real figures,
+    # which are generated at full permutation count by the CLI.
+    monkeypatch.setattr(si_report, "FIG_DIR", tmp_path)
     paths = si_report.run(n_perm=50)  # figures only; rigour lives in the CLI run
     assert len(paths) >= 2 and all(p.exists() and p.stat().st_size > 1000 for p in paths)
 
@@ -141,3 +144,20 @@ def test_proline_substitution_is_unanimous_in_direction():
     assert len(pro) >= 3
     assert (pro["n_accel"] == 0).all()
     assert (pro["split"] == 0).all()
+
+
+@pytest.mark.parametrize("module", [
+    "ingest_si", "ingest_types", "ingest_flagmeier",
+    "si_analysis", "cross_study", "discordance",
+])
+def test_module_runs_as_a_script(module):
+    """Each module documents `python -m asyn.<name>`; check it actually runs.
+
+    si_report is excluded: its CLI writes the repo's real artifacts.
+    """
+    import subprocess, sys, pathlib
+    r = subprocess.run([sys.executable, "-m", f"asyn.{module}"],
+                       cwd=pathlib.Path(__file__).resolve().parent.parent,
+                       env={"PYTHONPATH": "src", "PATH": "/usr/bin:/bin:/usr/local/bin"},
+                       capture_output=True, text=True, timeout=300)
+    assert r.returncode == 0, f"{module} CLI failed:\n{r.stderr[-800:]}"

@@ -121,20 +121,6 @@ def run() -> dict:
             "by_region": by_region(t), "headlines": headline_robustness(t)}
 
 
-if __name__ == "__main__":
-    r = run()
-    print(f"extraction sanity — rows breaching the sd bound: {len(r['violations'])}\n")
-    s = r["scored"]
-    print("MOST CONTESTED (literature splits):")
-    print(s.head(8).to_string(index=False))
-    print("\nMOST CONSISTENT:")
-    print(s.tail(6).to_string(index=False))
-    print("\nBY REGION:")
-    print(r["by_region"].to_string(index=False))
-    print("\nMOST SPLIT (papers pointing opposite ways):")
-    print(vote_split().head(5).to_string(index=False))
-    print("\nDO OUR OWN HEADLINES REST ON AGREEMENT?")
-    print(r["headlines"].to_string(index=False))
 
 
 def vote_split(df: pd.DataFrame | None = None, min_support: int = 5) -> pd.DataFrame:
@@ -176,3 +162,18 @@ def vote_split(df: pd.DataFrame | None = None, min_support: int = 5) -> pd.DataF
                "n_reduce", "split", "integrality_error"]]
             .sort_values(["split", "support"], ascending=[False, False])
             .reset_index(drop=True))
+
+if __name__ == "__main__":
+    r = run()
+    print(f"extraction sanity — rows breaching the sd bound: {len(r['violations'])}\n")
+    s = r["scored"]
+    print("MOST CONTESTED (literature splits):")
+    print(s.head(8).to_string(index=False))
+    print("\nMOST CONSISTENT:")
+    print(s.tail(6).to_string(index=False))
+    print("\nBY REGION:")
+    print(r["by_region"].to_string(index=False))
+    print("\nMOST SPLIT (papers pointing opposite ways):")
+    print(vote_split().head(5).to_string(index=False))
+    print("\nDO OUR OWN HEADLINES REST ON AGREEMENT?")
+    print(r["headlines"].to_string(index=False))

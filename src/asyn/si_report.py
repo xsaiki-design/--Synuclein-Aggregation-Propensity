@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-from . import si_analysis  # noqa: E402
+from . import discordance, si_analysis  # noqa: E402
 
 FIG_DIR = Path("reports/figures")
 SEQ_C, COND_C = "#205493", "#d96d2b"
@@ -90,17 +90,14 @@ def _save(fig, name) -> Path:
 def run(n_perm: int = 1000) -> list[Path]:
     df = si_analysis.load()
     perm = si_analysis.permutation_test(df, n_perm=n_perm)
-    Path("reports").mkdir(exist_ok=True)
-    perm.to_csv("reports/permutation_test.csv", index=False)
     figs = [fig_variance(perm), fig_scores_by_mutant(df)]
     types = si_analysis.TYPES_CSV
     if types.exists():
         figs.append(fig_type_by_domain(si_analysis.type_by_domain(si_analysis.load_types())))
     try:
-        from . import discordance
         figs.append(fig_vote_split(discordance.vote_split()))
-    except Exception:
-        pass  # optional: vote reconstruction needs type_scores.csv
+    except FileNotFoundError:
+        print("skipped vote-split figure: data/type_scores.csv missing")
     return figs
 
 
@@ -131,7 +128,6 @@ def fig_type_by_domain(mat) -> Path:
 
 def fig_vote_split(votes, top: int = 14) -> Path:
     """Stacked votes per mutation type: who says accelerate vs reduce."""
-    from . import discordance  # local import: optional analysis
     d = votes.head(top).iloc[::-1]
     labels = [f"{r['type']}  ({r.scope.replace('_',' ')})" for _, r in d.iterrows()]
     y = np.arange(len(d))
@@ -151,5 +147,10 @@ def fig_vote_split(votes, top: int = 14) -> Path:
 
 
 if __name__ == "__main__":
+    _df = si_analysis.load()
+    Path("reports").mkdir(exist_ok=True)
+    si_analysis.permutation_test(_df).to_csv(
+        "reports/permutation_test.csv", index=False)
+    print("wrote reports/permutation_test.csv")
     for p in run():
         print(f"wrote {p}")
