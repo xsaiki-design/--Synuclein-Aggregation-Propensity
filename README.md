@@ -67,8 +67,9 @@ lipid-induced nucleation, **100×** for secondary nucleation and only **10×**
 for elongation. A single lumped outcome averages that distinction away.
 
 Two mutants also flip sign between the bulk-assay literature and lipid-induced
-nucleation — E46K (+0.70 vs −2 log10) and H50Q (+0.85 vs −1). Reported as case
-studies, not as a rate: at n=4 the split is not distinguishable from chance
+nucleation — E46K (+0.70 vs −2 log10) and H50Q (+0.85 vs −1). Reported as case studies, not as a rate, and **not as independent
+corroboration** — Pancoe cites Flagmeier, so the two sources may share
+underlying experiments: at n=4 the split is not distinguishable from chance
 (binomial p = 1.0). Method and limits: [`COMPARISON_METHOD.md`](COMPARISON_METHOD.md).
 
 > **Scope limit on results 1 and 2.** Every familial mutant is N-terminal

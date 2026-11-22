@@ -204,3 +204,12 @@ def test_nac_is_robust_but_nterm_cterm_ordering_is_not():
     # the N-term/C-term gap collapses once controls are excluded
     assert abs(without["N-terminus"] - without["C-terminus"]) < 0.05
     assert abs(withc["N-terminus"] - withc["C-terminus"]) > 0.2
+
+
+def test_independence_of_candidate_sources():
+    """Pancoe cites Flagmeier, so that comparison is not independent."""
+    from asyn.cross_study import cited_by_pancoe
+    assert cited_by_pancoe("10.1073/pnas.1604645113")      # Flagmeier 2016
+    assert cited_by_pancoe("10.1073/pnas.1315346111")      # Buell 2014
+    assert cited_by_pancoe("10.1038/s41467-020-16564-3")   # Stephens 2020
+    assert not cited_by_pancoe("10.1038/s41467-022-32687-1")  # Ulamec 2022

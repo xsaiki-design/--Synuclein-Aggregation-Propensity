@@ -91,14 +91,31 @@ a rate to mean something.
 
 ## Weaknesses to fix before adding a third paper
 
-**1. Independence is unverified — STILL UNRESOLVED, and it gates everything.**
-Attempted and failed: Pancoe's reference list lives on ScienceDirect/JMB, and
-both are outside this environment's network allowlist; the PMC copy returns a
-167-character stub. Until it is read, no further paper can be counted as
-corroboration rather than double counting. Resolving it needs either an
-allowlist entry for the publisher host or the reference list supplied directly.
+**1. Independence — RESOLVED, and the answer is unfavourable.** Pancoe's
+reference list was retrieved by DOI content negotiation (`doi.org` redirects to
+`api.crossref.org`; 240 references, cached in `data/pancoe_references.csv`,
+checked by `cross_study.cited_by_pancoe`).
 
-**1b. The original wording of this point.** If a paper is already
+**Pancoe cites Flagmeier 2016** — the exact paper used here as a second source
+(PNAS 113:10328, `10.1073/pnas.1604645113`). It also cites Buell 2014,
+Stephens 2020 and Newberry 2020, three of the four other candidates.
+
+A citation does not prove a paper's measurements were tabulated among the 375
+examples; it may be cited only in discussion. But it removes the presumption of
+independence, and that is the direction that matters. **The Pancoe/Flagmeier
+comparison must therefore be read as potentially non-independent**, not as
+external corroboration. One observation cuts the other way: if Flagmeier's
+labels had been folded into Pancoe's scores, the two would tend to agree, and
+for E46K and H50Q they disagree sharply — so either those rows were not
+tabulated, or Flagmeier was outvoted by other reports.
+
+**Ulamec et al. 2022 is NOT cited** (`10.1038/s41467-022-32687-1`) and is the
+only candidate so far that is independent of this compilation. It is also the
+held-out external test set the original plan specified. It should be the next
+source added, and the independence of any further candidate should be checked
+with `cited_by_pancoe` before it is used.
+
+**1b. The original wording of this point.****1b. The original wording of this point.** If a paper is already
 inside Pancoe's 375-example compilation, it is not independent evidence, and
 agreement is partly circular. Flagmeier's inclusion status is **unknown**: the
 PMC page for Pancoe returned a 167-character stub, so the reference list could

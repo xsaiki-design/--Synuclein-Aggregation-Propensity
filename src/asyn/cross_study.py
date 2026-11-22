@@ -182,3 +182,27 @@ def mechanism_spread(study: str = "Flagmeier2016") -> pd.DataFrame:
         })
     return (pd.DataFrame(rows)
             .sort_values("spread_log10", ascending=False).reset_index(drop=True))
+
+
+PANCOE_REFS = Path("data/pancoe_references.csv")
+
+
+def cited_by_pancoe(doi: str) -> bool:
+    """Is this DOI in Pancoe's deposited reference list?
+
+    The independence test for any candidate source. Pancoe is a meta-analysis
+    of 375 published examples, so a paper it cites may already be inside the
+    compilation; treating it as corroboration then risks counting the same
+    underlying experiments twice.
+
+    A citation does not prove the paper's measurements were tabulated — it may
+    be cited only in discussion — but it removes the presumption of
+    independence, which is the direction that matters here.
+
+    Reference list retrieved by DOI content negotiation (doi.org redirects to
+    api.crossref.org); cached in data/pancoe_references.csv.
+    """
+    if not PANCOE_REFS.exists():
+        raise FileNotFoundError(f"{PANCOE_REFS} missing; see cross_study docstring")
+    refs = pd.read_csv(PANCOE_REFS, keep_default_na=False)
+    return doi.strip().lower() in set(refs["doi"].str.strip().str.lower())
