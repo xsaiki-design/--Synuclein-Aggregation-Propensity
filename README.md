@@ -36,7 +36,12 @@ themselves sit far apart — though the real exceptions are visible and kept
 ![scores by mutant](reports/figures/si_fig2_scores_by_mutant.png)
 
 **2. The NAC core is where sequence matters.** Support-weighted mean score by
-region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. Within the
+region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. **Only the
+NAC result is robust.** Those means include the ten same-class control rows;
+on class-changing substitutions alone the N-terminus and C-terminus are
+indistinguishable (−0.19 vs −0.20), and their ordering flips above a support
+threshold of 3. The NAC stays clearly lowest either way (−0.57 with controls,
+−0.70 without) at every threshold from 1 to 10. Within the
 NAC the strongest substitution is **X → Pro (−0.941, n=17)** — the
 β-sheet-breaking effect the fibril model predicts, recovered from the data.
 

@@ -191,3 +191,16 @@ def test_dispersion_ratio_is_gone():
     """score() misread extreme means as contested; vote_split replaces it."""
     from asyn import discordance
     assert not hasattr(discordance, "score")
+
+
+def test_nac_is_robust_but_nterm_cterm_ordering_is_not():
+    """NAC lowest holds with or without control rows; the other two do not."""
+    t = si_analysis.load_types()
+    withc = si_analysis.domain_means(t).set_index("scope")["weighted_mean_score"]
+    without = si_analysis.domain_means(t, transitions_only=True).set_index(
+        "scope")["weighted_mean_score"]
+    assert withc["NAC"] < withc["C-terminus"] and withc["NAC"] < withc["N-terminus"]
+    assert without["NAC"] < without["C-terminus"] and without["NAC"] < without["N-terminus"]
+    # the N-term/C-term gap collapses once controls are excluded
+    assert abs(without["N-terminus"] - without["C-terminus"]) < 0.05
+    assert abs(withc["N-terminus"] - withc["C-terminus"]) > 0.2

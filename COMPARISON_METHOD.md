@@ -91,7 +91,14 @@ a rate to mean something.
 
 ## Weaknesses to fix before adding a third paper
 
-**1. Independence is unverified — check it first.** If a paper is already
+**1. Independence is unverified — STILL UNRESOLVED, and it gates everything.**
+Attempted and failed: Pancoe's reference list lives on ScienceDirect/JMB, and
+both are outside this environment's network allowlist; the PMC copy returns a
+167-character stub. Until it is read, no further paper can be counted as
+corroboration rather than double counting. Resolving it needs either an
+allowlist entry for the publisher host or the reference list supplied directly.
+
+**1b. The original wording of this point.** If a paper is already
 inside Pancoe's 375-example compilation, it is not independent evidence, and
 agreement is partly circular. Flagmeier's inclusion status is **unknown**: the
 PMC page for Pancoe returned a 167-character stub, so the reference list could
@@ -155,6 +162,7 @@ would not.
 | Lázaro 2014 (PLoS Genet) | cellular inclusions, 19 variants | **cellular, not in vitro** — separate axis, never pooled |
 | Oh 2020 (Front Cell Neurosci) | transmission, aggregation, 8 mutants | independently reports H50Q promotes / G51D delays, matching our extremes |
 | Buell 2014 (PNAS) | condition dependence of mechanism | the control on claim 3 — conditions set absolute rate |
+| Zhang 2019 (ACS Chem Neurosci) | single-molecule + ThT, mutant lipid binding | `10.1021/acschemneuro.8b00579` — the previously unidentified title from the candidate list |
 
 The recurring hazard is endpoint drift: toxicity, inclusion counts and
 transmission are *not* aggregation kinetics. Pooling them would grow n while

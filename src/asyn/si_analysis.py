@@ -139,8 +139,19 @@ def load_types(path: Path = TYPES_CSV) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def domain_means(df: pd.DataFrame) -> pd.DataFrame:
-    """Support-weighted mean aggregation score per sequence region."""
+def domain_means(df: pd.DataFrame, transitions_only: bool = False) -> pd.DataFrame:
+    """Support-weighted mean aggregation score per sequence region.
+
+    By default this includes the ten same-class "Cntrl" rows (e.g. nP -> nP)
+    alongside the 16 class-changing transitions. That choice matters: on
+    transitions alone the N-terminus and C-terminus are indistinguishable
+    (-0.19 vs -0.20), whereas including the controls separates them
+    (-0.10 vs -0.35). The NAC being the most affected region is robust either
+    way (-0.57 with controls, -0.70 without) and across support thresholds
+    1 to 10; the N-terminus/C-terminus ordering is not.
+    """
+    if transitions_only:
+        df = df[df["type"].isin(TRANSITIONS)]
     rows = []
     for scope, g in df.groupby("scope"):
         g = g[g["average"].notna() & (g["support"] > 0)]
