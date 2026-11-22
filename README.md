@@ -31,10 +31,15 @@ themselves sit far apart — though the real exceptions are visible and kept
 ![scores by mutant](reports/figures/si_fig2_scores_by_mutant.png)
 
 **2. The NAC core is where sequence matters.** Support-weighted mean score by
-region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. The
-strongest single substitution is **X → Pro (−0.88, n=33)**, strongest inside
-the NAC (−0.94) — the β-sheet-breaking effect the fibril model predicts,
-recovered from the data.
+region: **NAC (61–95) −0.57**, C-terminus −0.35, N-terminus −0.10. Within the
+NAC the strongest substitution is **X → Pro (−0.941, n=17)** — the
+β-sheet-breaking effect the fibril model predicts, recovered from the data.
+
+Ranked *within* each region, the strongest effects differ in sign: N-terminus
+**nβ → β +1.00** (n=5), NAC **X → Pro −0.94** (n=17), C-terminus **B → nB
+−1.00** (n=7). The whole-protein figure often quoted for X → Pro (−0.88, n=33)
+aggregates 16 N-terminal and 17 NAC measurements and **none** from the
+C-terminus, so it is not a regional result.
 
 ![type by domain](reports/figures/si_fig3_type_by_domain.png)
 

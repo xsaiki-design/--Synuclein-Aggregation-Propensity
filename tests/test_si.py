@@ -67,3 +67,20 @@ def test_none_category_is_not_parsed_as_missing():
 def test_conditions_data_matches_rendered_pages():
     from asyn import ingest_si
     ingest_si._verify(si_analysis.load())  # raises on CID drift
+
+
+def test_whole_protein_rows_partition_across_regions():
+    """X -> Pro's n=33 is an aggregate: 16 N-term + 17 NAC + 0 C-term."""
+    t = si_analysis.load_types()
+    x = t[t["type"] == "X -> Pro"].set_index("scope")["support"]
+    assert x["whole_protein"] == 33
+    assert x["N-terminus"] + x["NAC"] + x["C-terminus"] == x["whole_protein"]
+    assert x["C-terminus"] == 0  # proline substitution untested in the C-terminus
+
+
+def test_strongest_by_region_differs_in_sign():
+    top = si_analysis.strongest_by_region(si_analysis.load_types()).set_index("scope")
+    assert top.loc["NAC", "type"] == "X -> Pro"
+    assert top.loc["N-terminus", "average"] > 0   # N-term strongest accelerates
+    assert top.loc["C-terminus", "average"] < 0   # C-term strongest blocks
+    assert (top["support"] >= 5).all()

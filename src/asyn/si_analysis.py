@@ -190,3 +190,30 @@ def permutation_test(df: pd.DataFrame, n_perm: int = 1000, seed: int = 0) -> pd.
             "p_category": round(float((np.sum(null_c >= obs_c) + 1) / (n_perm + 1)), 4),
         })
     return pd.DataFrame(rows)
+
+
+def strongest_by_region(df: pd.DataFrame, min_support: int = 5) -> pd.DataFrame:
+    """Strongest substitution within each sequence region.
+
+    The whole-protein rows of Table S3 aggregate across regions, so a figure
+    like "X -> Pro, -0.88, n=33" is not a regional result: those 33 split 16 in
+    the N-terminus and 17 in the NAC, with none in the C-terminus. Rank within
+    each region instead, and apply a support floor so a single unanimous
+    measurement cannot be called the strongest effect.
+    """
+    d = df[df["type"].isin(TRANSITIONS) & df["average"].notna()
+           & (df["support"] >= min_support) & df["scope"].isin(DOMAINS)].copy()
+    d["abs_effect"] = d["average"].abs()
+    d = d.sort_values(["abs_effect", "support"], ascending=[False, False])
+    top = d.groupby("scope", sort=False).head(1)
+    return (top.set_index("scope").reindex(DOMAINS).reset_index()
+              [["scope", "type", "average", "sd", "support"]])
+
+
+def region_ranking(df: pd.DataFrame, scope: str) -> pd.DataFrame:
+    """Every substitution with data in one region, ranked by absolute effect."""
+    d = df[(df["scope"] == scope) & df["type"].isin(TRANSITIONS)
+           & df["average"].notna() & (df["support"] > 0)].copy()
+    d["abs_effect"] = d["average"].abs()
+    return (d.sort_values(["abs_effect", "support"], ascending=[False, False])
+             [["type", "average", "sd", "support"]].reset_index(drop=True))

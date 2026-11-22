@@ -97,10 +97,32 @@ aggregation most, mutations in the N-terminus barely matter:
 | C-terminus | −0.35 | 110 |
 | N-terminus | −0.10 | 178 |
 
-The strongest single substitution effects (whole protein, n ≥ 10) are
-**X → Pro (−0.88, n=33)** and **X → PG (−0.85, n=34)** — introducing a proline
-blocks aggregation, and most strongly inside the NAC (−0.94). That is the
+Across the whole protein the largest effects (n ≥ 10) are **X → Pro (−0.88,
+n=33)** and **X → PG (−0.85, n=34)** — proline blocks aggregation, the
 β-sheet-breaking behaviour the fibril model predicts, recovered from the data.
+
+**But those whole-protein rows aggregate across regions and should not be read
+as regional results.** X → Pro's 33 measurements split 16 in the N-terminus and
+17 in the NAC, with **none in the C-terminus** — so proline substitution is
+simply untested there. Ranked within each region (support floor n ≥ 5,
+`asyn.si_analysis.strongest_by_region`):
+
+| region | strongest substitution | score | sd | n |
+|---|---|---|---|---|
+| N-terminus | nβ → β | **+1.000** | 0.000 | 5 |
+| NAC | X → Pro | **−0.941** | 0.235 | 17 |
+| C-terminus | B → nB | **−1.000** | 0.000 | 7 |
+
+The regional view carries information the aggregate loses: **the N-terminus's
+strongest effect accelerates aggregation, while the NAC's and C-terminus's
+block it.** Averaging over regions partly cancels those opposing signs.
+
+Two cautions on reading that table. The N-terminus and C-terminus winners rest
+on n=5 and n=7 with sd = 0 — unanimous, but small; X → Pro in the NAC is the
+only one resting on substantial support. And in the N-terminus X → PG is
+numerically identical to X → Pro (−0.813, n=16) because every PG substitution
+there is a proline one — X → Gly has no N-terminal measurements. Per-region
+rankings: `asyn.si_analysis.region_ranking`.
 
 ![type by domain](reports/figures/si_fig3_type_by_domain.png)
 
