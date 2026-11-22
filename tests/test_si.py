@@ -116,3 +116,28 @@ def test_mechanism_spread_is_largest_for_nucleation():
     m = cross_study.mechanism_spread().set_index("endpoint")["spread_log10"]
     assert m["lipid_nucleation"] > m["secondary_nucleation"] > m["elongation"]
     assert m["lipid_nucleation"] >= 4.0   # 10,000-fold range
+
+
+def test_vote_reconstruction_yields_whole_experiments():
+    """mean+sd+n must decompose into integer counts — a third extraction check."""
+    from asyn import discordance
+    v = discordance.vote_split()
+    assert v["integrality_error"].max() < 0.05
+    assert (v[["n_accel", "n_noeffect", "n_reduce"]] >= 0).all().all()
+    assert (v["n_accel"] + v["n_noeffect"] + v["n_reduce"]
+            - v["support"]).abs().max() <= 1
+
+
+def test_sd_never_breaches_the_categorical_bound():
+    from asyn import discordance
+    assert len(discordance.validate(discordance.load_types())) == 0
+
+
+def test_proline_substitution_is_unanimous_in_direction():
+    """No experiment anywhere reports X -> Pro accelerating aggregation."""
+    from asyn import discordance
+    v = discordance.vote_split()
+    pro = v[v["type"] == "X -> Pro"]
+    assert len(pro) >= 3
+    assert (pro["n_accel"] == 0).all()
+    assert (pro["split"] == 0).all()

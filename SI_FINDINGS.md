@@ -134,3 +134,65 @@ control** — which is exactly the authors' recommendation. Testing whether raw,
 un-normalized aggregation rates are condition-dominated needs the raw kinetics
 (T½), which this SI does not provide. The continuous-T½ regression scaffold
 (`asyn.features/splits/decompose/predict`) is kept ready for that data.
+
+
+## Does the literature agree? (`asyn.discordance`)
+
+Tables S3–S6 report a **standard deviation** beside every mean. Used everywhere
+else as noise, it is really a record of how much the published experiments
+disagreed. Because the scores are means of {−1, 0, +1} labels, a group's mean,
+SD and count determine the vote exactly:
+
+> n₊ = n(s² + m² + m)/2  ·  n₋ = n(s² + m² − m)/2  ·  n₀ = n − n₊ − n₋
+
+So each row can be read back as *"k experiments found acceleration, j found
+reduction"* — no modelling, just algebra.
+
+**This is also a third, independent check on the extraction.** The
+reconstructed counts come out as whole experiments (max integrality error
+**0.026**), and no row breaches the bound sd ≤ √(1−mean²). A mis-decoded mean
+or SD would fail both.
+
+### Proline is the one thing nobody disputes
+
+| group | accelerate | no effect | reduce |
+|---|---|---|---|
+| X → Pro, whole protein | **0** | 4 | **29** |
+| X → Pro, NAC | **0** | 1 | **16** |
+| X → Pro, N-terminus | **0** | 3 | **13** |
+| X → PG, NAC | **0** | 2 | **16** |
+
+**Not one experiment anywhere reports a proline substitution accelerating
+aggregation.** That is a stronger statement than the −0.88 mean, and it
+survives the discordance check that other findings fail.
+
+### What the field is deadlocked about
+
+| group | accelerate | no effect | reduce | split |
+|---|---|---|---|---|
+| nB → B, whole protein | 5 | 2 | 5 | **0.50** |
+| nP → P, N-terminus | 5 | 0 | 4 | 0.44 |
+| B → nB, N-terminus | 3 | 0 | 4 | 0.43 |
+| Sm → Lg, whole protein | 5 | 4 | 7 | 0.42 |
+
+**Changes in bulk, hydrophobicity and size split the literature almost evenly.**
+These are exactly the substitutions whose effect is most likely to depend on
+something unrecorded — protein prep, surface, assay geometry — because the
+sequence change alone evidently does not determine the outcome.
+
+![vote split](reports/figures/si_fig4_vote_split.png)
+
+### A regional asymmetry
+
+Support-weighted mean discordance: **N-terminus 0.76** (4 contested, 1
+consensus) · **NAC 0.74** (3 contested, 0 consensus) · **C-terminus 0.34**
+(0 contested, 3 consensus). The field argues about the N-terminus and the NAC
+and agrees about the C-terminus — plausibly because C-terminal truncations
+produce large, unambiguous effects while NAC substitutions sit close to the
+threshold where conditions decide the sign.
+
+**A caution on the dispersion index.** `discordance.score()` divides SD by the
+maximum attainable at that mean. It is useful for ranking, but it overstates
+disagreement at extreme means: X → Pro in the NAC scores 0.69 ("mixed") while
+the vote is 16–0–1. **Prefer `vote_split()`;** the ratio is kept only for
+ranking and is documented as secondary.

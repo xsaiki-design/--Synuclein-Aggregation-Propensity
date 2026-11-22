@@ -65,6 +65,14 @@ studies, not as a rate: at n=4 the split is not distinguishable from chance
 > the NAC and X → Pro findings rest on Pancoe alone — no second source yet
 > covers a NAC or C-terminal variant.
 
+**4. The literature is unanimous about proline and deadlocked about bulk.**
+Each group's mean, SD and count recover the underlying vote exactly. **No
+experiment anywhere reports X → Pro accelerating aggregation** (0 vs 29), while
+nB → B splits 5–5 and nP → P splits 5–4. The reconstruction doubles as a third
+extraction check: counts come back as whole experiments (error < 0.03).
+
+![vote split](reports/figures/si_fig4_vote_split.png)
+
 ## The data, and how it was verified
 The outcome in this SI is a **categorical aggregation score** in {−1, 0, +1}
 (reduces / no effect / accelerates), **not** continuous T½. T½ is not tabulated

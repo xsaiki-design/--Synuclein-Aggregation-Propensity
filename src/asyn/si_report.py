@@ -96,6 +96,11 @@ def run(n_perm: int = 1000) -> list[Path]:
     types = si_analysis.TYPES_CSV
     if types.exists():
         figs.append(fig_type_by_domain(si_analysis.type_by_domain(si_analysis.load_types())))
+    try:
+        from . import discordance
+        figs.append(fig_vote_split(discordance.vote_split()))
+    except Exception:
+        pass  # optional: vote reconstruction needs type_scores.csv
     return figs
 
 
@@ -120,6 +125,29 @@ def fig_type_by_domain(mat) -> Path:
                  "(blue = slows, red = accelerates; — = no data)", fontsize=11)
     fig.colorbar(im, ax=ax, shrink=0.6, label="aggregation score")
     return _save(fig, "si_fig3_type_by_domain.png")
+
+
+
+
+def fig_vote_split(votes, top: int = 14) -> Path:
+    """Stacked votes per mutation type: who says accelerate vs reduce."""
+    from . import discordance  # local import: optional analysis
+    d = votes.head(top).iloc[::-1]
+    labels = [f"{r['type']}  ({r.scope.replace('_',' ')})" for _, r in d.iterrows()]
+    y = np.arange(len(d))
+    fig, ax = plt.subplots(figsize=(8.6, 0.42 * len(d) + 2.3))
+    ax.barh(y, -d.n_reduce, color="#205493", label="reported reduction")
+    ax.barh(y, d.n_accel, color="#d96d2b", label="reported acceleration")
+    ax.barh(y, d.n_noeffect, left=d.n_accel, color="#cfd6de",
+            label="no effect")  # stacked beyond acceleration, not overlaid
+    ax.axvline(0, color="k", lw=1)
+    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=8.5)
+    ax.set_xlabel("← experiments reporting reduction      experiments reporting acceleration →")
+    ax.set_title("Where the literature agrees, and where it splits\n"
+                 "(reconstructed from each group's mean, SD and count)", fontsize=11)
+    ax.legend(frameon=False, fontsize=8, ncol=3,
+              loc="lower center", bbox_to_anchor=(0.5, -0.17))
+    return _save(fig, "si_fig4_vote_split.png")
 
 
 if __name__ == "__main__":
