@@ -84,3 +84,35 @@ def test_strongest_by_region_differs_in_sign():
     assert top.loc["N-terminus", "average"] > 0   # N-term strongest accelerates
     assert top.loc["C-terminus", "average"] < 0   # C-term strongest blocks
     assert (top["support"] >= 5).all()
+
+
+def test_flagmeier_rows_carry_auditable_quotes():
+    from asyn import ingest_flagmeier
+    df = ingest_flagmeier.build()
+    assert len(df) == 15
+    assert (df["quote"].str.len() > 40).all()        # every value traceable
+    assert (df["extraction"] == "text_statement").all()
+    assert df["censored"].sum() == 2                 # the two "undetectably slow"
+
+
+def test_cross_study_small_n_is_not_called_significant():
+    """2/4 sign agreement must not be reported as a finding."""
+    from asyn import cross_study
+    a = cross_study.agreement_summary()
+    assert not a["distinguishable_from_chance"].any()
+    assert (a["binom_p"] >= 0.05).all()
+
+
+def test_claims_untestable_from_flagmeier_are_marked_so():
+    from asyn import cross_study
+    c = cross_study.claim_checks().set_index("claim")
+    assert not c.loc["NAC is the most impactful region", "testable_here"]
+    assert not c.loc["X -> Pro is the strongest single substitution", "testable_here"]
+
+
+def test_mechanism_spread_is_largest_for_nucleation():
+    """The within-study finding: sequence sensitivity is mechanism-dependent."""
+    from asyn import cross_study
+    m = cross_study.mechanism_spread().set_index("endpoint")["spread_log10"]
+    assert m["lipid_nucleation"] > m["secondary_nucleation"] > m["elongation"]
+    assert m["lipid_nucleation"] >= 4.0   # 10,000-fold range

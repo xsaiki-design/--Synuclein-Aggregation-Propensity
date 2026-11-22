@@ -49,6 +49,22 @@ C-terminus, so it is not a regional result.
 > expressed against a matched WT control** — which is exactly the authors'
 > recommendation, not evidence that raw rates are condition-independent.
 
+**3. How much a mutation matters depends on which mechanism you measure.**
+From [Flagmeier et al. 2016](https://pmc.ncbi.nlm.nih.gov/articles/PMC5027465),
+same five familial mutants, same lab: their effects span **10,000×** for
+lipid-induced nucleation, **100×** for secondary nucleation and only **10×**
+for elongation. A single lumped outcome averages that distinction away.
+
+Two mutants also flip sign between the bulk-assay literature and lipid-induced
+nucleation — E46K (+0.70 vs −2 log10) and H50Q (+0.85 vs −1). Reported as case
+studies, not as a rate: at n=4 the split is not distinguishable from chance
+(binomial p = 1.0). Method and limits: [`COMPARISON_METHOD.md`](COMPARISON_METHOD.md).
+
+> **Scope limit on results 1 and 2.** Every familial mutant is N-terminal
+> (residues 30–53), so the condition analysis is an N-terminus analysis, and
+> the NAC and X → Pro findings rest on Pancoe alone — no second source yet
+> covers a NAC or C-terminal variant.
+
 ## The data, and how it was verified
 The outcome in this SI is a **categorical aggregation score** in {−1, 0, +1}
 (reduces / no effect / accelerates), **not** continuous T½. T½ is not tabulated

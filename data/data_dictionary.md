@@ -90,6 +90,31 @@ garbage.
 
 ---
 
+## `cross_study_effects.csv` — effects from other papers (15 rows)
+One row per (study × mutant × mechanism). Built by `asyn.ingest_flagmeier`;
+one ingester module per paper. Full method and limits:
+[`COMPARISON_METHOD.md`](../COMPARISON_METHOD.md).
+
+| Column | Meaning |
+|---|---|
+| `study`, `year`, `source` | provenance. **`study` is a grouping key — never pool across it.** |
+| `mutant` | join key to the Pancoe data |
+| `endpoint` | what was actually measured (`lipid_nucleation`, `secondary_nucleation`, `elongation`) — never compared across without a declared mapping |
+| `condition_class` | `lipid_vesicles` / `seeded_acidic` / `seeded` / `bulk` / `cellular` |
+| `normalized_to_wt` | whether the value is relative to a WT control |
+| `value`, `value_type` | e.g. `2.0`, `log10_fold_vs_wt` |
+| `censored` | true where the source gives a bound ("undetectably slow"), not a value |
+| `extraction` | `text_statement` / `table_decoded` / `figure_digitised` |
+| `quote` | verbatim sentence supporting the value, so every number is auditable |
+
+> **Flagmeier values are prose-stated approximations**, not digitised
+> measurements — the paper gives orders of magnitude in text and tabulates no
+> rate constants. Good for direction and rough magnitude; not for regression on
+> exact values. The two `censored` rows report "undetectably slow"; their
+> −2.0 is a floor standing in for a bound.
+
+---
+
 ## The T½ scaffold — `aggregation_curated.csv` (not real data)
 `asyn.features / splits / decompose / predict` implement a leave-one-study-out
 regression pipeline whose outcome is continuous **T½ in hours**, one row per
