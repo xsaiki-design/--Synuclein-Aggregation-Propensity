@@ -14,8 +14,13 @@ Everything below is extracted from that PDF and verified against it — see
 
 **1. Sequence explains the score; condition category carries no signal.**
 Across the 6 familial mutants, *which mutant* explains 83–94% of the variance
-in aggregation score in each condition table, against a shuffled-label chance
-level of 36–45% (p = 0.002–0.013). *Which condition category* explains 3–8%,
+**among condition-category means**, against a shuffled-label chance level of
+36–45% (p = 0.002–0.013). That figure is an **upper bound**: each point is
+already an average of up to 16 experiments, so disagreement inside a cell is
+removed before the variance is computed. At the level of individual reported
+experiments the same model explains **at least 51–58%**
+(`variance_explained_bounds`); the true value lies in between and cannot be
+resolved, because S7–S10 report no standard deviations. *Which condition category* explains 3–8%,
 against a chance level of 16–23% — i.e. **below chance in every table**. The
 chance levels matter: mutant is a 5-df factor on 14–19 cells, so raw R² alone
 would overstate the contrast. Each table is tested on its own: the four tables

@@ -217,3 +217,39 @@ def region_ranking(df: pd.DataFrame, scope: str) -> pd.DataFrame:
     d["abs_effect"] = d["average"].abs()
     return (d.sort_values(["abs_effect", "support"], ascending=[False, False])
              [["type", "average", "sd", "support"]].reset_index(drop=True))
+
+
+def variance_explained_bounds(df: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Bracket the mutant-identity R² at the level of individual experiments.
+
+    `variance_explained` and `permutation_test` fit cell *means*: each of the
+    14-19 points is already an average of up to 16 experiments, so disagreement
+    inside a cell is averaged away before the variance is computed. That makes
+    the reported R² an upper bound on the experiment-level figure.
+
+    S7-S10 give no standard deviations, so within-cell variance is unknown. It
+    is bounded though: for labels in {-1,0,+1} with cell mean m it cannot exceed
+    1 - m^2. Putting it at that maximum gives the lower bound. The true value
+    lies between the two columns and cannot be resolved from this source.
+    """
+    d = load() if df is None else df
+    rows = []
+    for dim, g in d.groupby("dimension"):
+        n = g["support"].values.astype(float)
+        m = g["score"].values
+        grand = np.average(m, weights=n)
+        mut = g.groupby("mutant").apply(
+            lambda x: np.average(x["score"], weights=x["support"]),
+            include_groups=False)
+        mm = g["mutant"].map(mut).values
+        ss_model = float(np.sum(n * (mm - grand) ** 2))
+        ss_between = float(np.sum(n * (m - grand) ** 2))
+        ss_within_max = float(np.sum(n * (1 - m ** 2)))
+        rows.append({
+            "dimension": dim,
+            "cells": len(g),
+            "experiments": int(n.sum()),
+            "r2_cell_means": round(ss_model / ss_between, 3),
+            "r2_experiment_lower": round(ss_model / (ss_between + ss_within_max), 3),
+        })
+    return pd.DataFrame(rows)

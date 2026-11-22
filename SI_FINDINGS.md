@@ -28,6 +28,20 @@ Support-weighted variance explained in the aggregation score:
 | salt | 0.88 | *0.45* | 0.013 | 0.08 | *0.21* |
 | shaking | 0.83 | *0.36* | 0.004 | 0.03 | *0.23* |
 
+**What the denominator is.** These R² values are fitted on condition-category
+*means*, not on individual experiments: each of the 14–19 points already
+averages up to 16 measurements, so within-cell disagreement is gone before the
+variance is computed. The same model at experiment level explains **at least
+51–58%** (`asyn.si_analysis.variance_explained_bounds`), taking within-cell
+variance at its maximum for labels in {−1,0,+1}. The true figure is somewhere
+between that and the numbers below, and S7–S10 report no SDs, so it cannot be
+narrowed from this source. Quote the range, not the ceiling.
+
+Two further limits on how far these numbers travel: the scores are normalised
+to a matched WT control within each study, so this is variance in *normalised
+effect* rather than in reported aggregation; and all six familial mutants are
+N-terminal (residues 30–53), so this is an N-terminus result.
+
 **Raw R² alone would overstate this, and the chance columns are why.** Mutant
 is a 5-degree-of-freedom factor and a condition category has 1–2, on only
 14–19 cells, so the larger factor explains more variance mechanically: a

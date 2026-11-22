@@ -161,3 +161,12 @@ def test_module_runs_as_a_script(module):
                        env={"PYTHONPATH": "src", "PATH": "/usr/bin:/bin:/usr/local/bin"},
                        capture_output=True, text=True, timeout=300)
     assert r.returncode == 0, f"{module} CLI failed:\n{r.stderr[-800:]}"
+
+
+def test_reported_r2_is_an_upper_bound():
+    """Cell-mean R² must exceed the experiment-level lower bound, and the gap
+    must be large enough that the headline cannot be quoted without it."""
+    b = si_analysis.variance_explained_bounds()
+    assert (b["r2_cell_means"] > b["r2_experiment_lower"]).all()
+    assert (b["r2_experiment_lower"] < 0.6).all()
+    assert (b["r2_cell_means"] >= 0.82).all()
