@@ -232,3 +232,68 @@ labelled X → Pro in the NAC "mixed" when its vote is 16-0-1. The ratio has bee
 removed from the codebase.
 
 
+
+## A second source, and why it is not corroboration (`asyn.cross_study`)
+
+[Flagmeier et al. 2016](https://pmc.ncbi.nlm.nih.gov/articles/PMC5027465) covers
+the same familial mutants but reports orders of magnitude relative to WT,
+separated by mechanism. Extracted by `asyn.ingest_flagmeier`; every row carries
+the verbatim sentence it came from, because the paper states its effects in
+prose and tabulates no rate constants.
+
+**Pancoe cites Flagmeier.** Pancoe's deposited reference list (240 entries,
+retrieved by DOI content negotiation, cached in `data/pancoe_references.csv`,
+queryable with `cross_study.cited_by_pancoe`) contains it at
+`10.1073/pnas.1604645113`, along with Buell 2014, Stephens 2020 and Newberry
+2020. A citation does not prove a paper's measurements were tabulated among the
+375 examples, but it removes the presumption of independence. **This comparison
+is therefore not an external check**, and is reported as case observations.
+
+Of the candidate sources checked, only **Ulamec et al. 2022**
+(`10.1038/s41467-022-32687-1`) is *not* cited. It is also the held-out test set
+the original plan named, so it is the next source to add.
+
+### Case observations, not a rate
+Against Flagmeier's lipid-induced nucleation, A53T (+0.91 vs +2) and G51D
+(−0.50 vs −2) agree in direction; **E46K (+0.70 vs −2) and H50Q (+0.85 vs −1)
+flip**. At n=4 that split is binomial p = 1.0 — not distinguishable from chance,
+and not quotable as an agreement rate.
+
+One point cuts against the circularity concern and is recorded rather than
+suppressed: had Flagmeier's labels been folded into Pancoe's scores, the two
+would tend to agree, and for E46K and H50Q they disagree sharply.
+
+### The one result needing no comparison
+Within Flagmeier alone — same five mutants, one lab, one protein prep — the
+spread across those mutants differs by mechanism:
+
+| mechanism | spread | fold range |
+|---|---|---|
+| lipid-induced nucleation | 4.0 log10 | **10,000×** |
+| secondary nucleation | 2.0 log10 (censored) | 100× |
+| elongation | 1.0 log10 | 10× |
+
+**How much a mutation matters depends on which mechanism is measured**, by three
+orders of magnitude. No cross-study comparison is involved, so none of the
+independence or endpoint caveats apply. The values are prose-stated
+approximations at n=5, so treat them as directional.
+
+## Status of every claim
+
+| claim | status |
+|---|---|
+| No *published* experiment reports X → Pro accelerating (0/29) | **holds** — publication bias unmeasurable |
+| Bulk/hydrophobicity deadlocked (nB → B 5–5) | **holds** |
+| NAC is the most affected region | **holds** — −0.70 transitions-only, −0.57 with controls, at every threshold 1–10 |
+| Mechanism dependence (10,000× vs 10×) | **holds** — within-study, n=5, prose-stated |
+| Condition *category* carries no signal | **holds** — below its own chance baseline in all four tables |
+| Mutant identity explains 83–94% | **qualified** — ceiling; experiment-level floor 51–58%; N-terminus only; normalised effect |
+| X → Pro strongest substitution | **qualified** — only the NAC row (n=17); the −0.88/n=33 figure is a cross-region aggregate with no C-terminal data |
+| Pooled R² = 0.86, p = 0.001 | **withdrawn** — pseudo-replication across the four condition tables |
+| Regional "contested" labels (0.76 / 0.74 / 0.34) | **withdrawn** — dispersion ratio misread extreme means |
+| Three-way region ordering (−0.10 / −0.35 / −0.57) | **withdrawn** — N- and C-terminus indistinguishable without control rows |
+| Per-region strongest for N- and C-terminus (±1.000) | **withdrawn** — selection on the maximum at n=5 and 7 |
+| Flagmeier as external corroboration | **withdrawn** — Pancoe cites it |
+
+Every finding rests on one meta-analysis, and no independent external check has
+yet been performed.

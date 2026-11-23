@@ -88,6 +88,12 @@ experiments, error < 0.03).
 
 ![vote split](reports/figures/si_fig4_vote_split.png)
 
+> **Status of every claim** — which results hold, which are qualified, and
+> which have been withdrawn after review:
+> [`SI_FINDINGS.md`](SI_FINDINGS.md#status-of-every-claim). Five of the
+> project's claims were withdrawn or qualified on closer checking; no
+> independent external check has yet been performed.
+
 ## The data, and how it was verified
 The outcome in this SI is a **categorical aggregation score** in {−1, 0, +1}
 (reduces / no effect / accelerates), **not** continuous T½. T½ is not tabulated
